@@ -1,0 +1,228 @@
+.timelineContainer {
+  width: 100%;
+  background: var(--gray-alpha-100);
+  border-radius: 8px;
+  padding: 20px;
+  margin: 20px 0;
+}
+
+.timelineControls {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 15px;
+}
+
+.addButton {
+  background: var(--foreground);
+  color: var(--background);
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.addButton:hover {
+  background: var(--button-primary-hover);
+}
+
+.timeMarkers {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  padding: 0 10px;
+  position: relative;
+}
+
+.timeMarker {
+  position: relative;
+  width: 1px;
+  height: 10px;
+  background: var(--gray-alpha-200);
+}
+
+.timeMarker:nth-child(10n + 1) {
+  height: 15px;
+  background: var(--foreground);
+}
+
+.timeLabel {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.8rem;
+  color: var(--gray-alpha-200);
+  white-space: nowrap;
+}
+
+.timeline {
+  position: relative;
+  height: 80px;
+  background: var(--gray-alpha-200);
+  border-radius: 4px;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: border-color 0.2s;
+}
+
+.timeline:hover {
+  border-color: var(--gray-alpha-200);
+}
+
+.segment {
+  position: absolute;
+  height: 100%;
+  background: var(--foreground);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  overflow: hidden;
+  border: 2px solid transparent;
+  user-select: none;
+}
+
+.segment:hover {
+  background: var(--button-primary-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.segment.selected {
+  background: var(--button-primary-hover);
+  border-color: var(--foreground);
+  box-shadow: 0 0 0 2px var(--foreground), 0 4px 8px rgba(0, 0, 0, 0.2);
+  transform: translateY(-2px);
+}
+
+.removeButton {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 20px;
+  height: 20px;
+  background: rgba(255, 0, 0, 0.8);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s;
+  z-index: 15;
+}
+
+.segment:hover .removeButton {
+  opacity: 1;
+}
+
+.removeButton:hover {
+  background: rgba(255, 0, 0, 1);
+}
+
+.cutPoint {
+  position: absolute;
+  top: 0;
+  width: 4px;
+  height: 100%;
+  cursor: ew-resize;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cutPoint:hover {
+  width: 8px;
+}
+
+.cutPoint.dragging {
+  width: 8px;
+}
+
+.cutPointHandle {
+  width: 4px;
+  height: 60%;
+  background: var(--foreground);
+  border-radius: 2px;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+}
+
+.cutPoint:hover .cutPointHandle,
+.cutPoint.dragging .cutPointHandle {
+  width: 6px;
+  background: var(--button-primary-hover);
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.5);
+}
+
+.segmentContent {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  padding: 0 8px;
+  text-align: center;
+  color: var(--background);
+  font-size: 0.8rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: none;
+}
+
+.segmentTime {
+  display: block;
+  font-size: 0.7rem;
+  opacity: 0.8;
+  margin-bottom: 2px;
+}
+
+.segmentAction {
+  display: block;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+@media (max-width: 600px) {
+  .timelineContainer {
+    padding: 15px;
+  }
+
+  .timeline {
+    height: 60px;
+  }
+
+  .segmentContent {
+    font-size: 0.7rem;
+  }
+
+  .segmentTime {
+    font-size: 0.6rem;
+  }
+
+  .cutPoint {
+    width: 3px;
+  }
+
+  .cutPoint:hover {
+    width: 6px;
+  }
+
+  .cutPointHandle {
+    width: 3px;
+  }
+
+  .cutPoint:hover .cutPointHandle {
+    width: 4px;
+  }
+
+  .removeButton {
+    width: 18px;
+    height: 18px;
+    font-size: 12px;
+  }
+}
