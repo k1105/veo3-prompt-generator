@@ -2,16 +2,20 @@
 
 import styles from "../page.module.css";
 import FormField from "./FormField";
-import {SpatialLayout} from "../types";
+import {SpatialLayout, LockState} from "../types";
 
 type SpatialLayoutSectionProps = {
   spatialLayout: SpatialLayout;
   onChange: (field: keyof SpatialLayout, value: string) => void;
+  lockState?: LockState["spatial_layout"];
+  onLockToggle?: (field: string) => void;
 };
 
 export default function SpatialLayoutSection({
   spatialLayout,
   onChange,
+  lockState,
+  onLockToggle,
 }: SpatialLayoutSectionProps) {
   return (
     <section className={styles.formSection}>
@@ -24,6 +28,8 @@ export default function SpatialLayoutSection({
         placeholder="Describe the main subject"
         type="textarea"
         rows={3}
+        locked={lockState?.main}
+        onLockToggle={onLockToggle ? () => onLockToggle("main") : undefined}
       />
       <FormField
         id="foreground"
@@ -33,6 +39,10 @@ export default function SpatialLayoutSection({
         placeholder="Describe foreground elements"
         type="textarea"
         rows={2}
+        locked={lockState?.foreground}
+        onLockToggle={
+          onLockToggle ? () => onLockToggle("foreground") : undefined
+        }
       />
       <FormField
         id="midground"
@@ -42,6 +52,10 @@ export default function SpatialLayoutSection({
         placeholder="Describe midground elements"
         type="textarea"
         rows={2}
+        locked={lockState?.midground}
+        onLockToggle={
+          onLockToggle ? () => onLockToggle("midground") : undefined
+        }
       />
       <FormField
         id="background"
@@ -51,6 +65,10 @@ export default function SpatialLayoutSection({
         placeholder="Describe background elements"
         type="textarea"
         rows={2}
+        locked={lockState?.background}
+        onLockToggle={
+          onLockToggle ? () => onLockToggle("background") : undefined
+        }
       />
     </section>
   );

@@ -2,12 +2,13 @@
 
 import {useState} from "react";
 import styles from "./page.module.css";
-import {FormData, TimeSegment} from "./types";
+import {FormData, TimeSegment, LockState} from "./types";
 import BasicInfoSection from "./components/BasicInfoSection";
 import VisualAudioSection from "./components/VisualAudioSection";
 import SpatialLayoutSection from "./components/SpatialLayoutSection";
 import TimeAxisSection from "./components/TimeAxisSection";
 import YamlOutputSection from "./components/YamlOutputSection";
+import FloatingGenerator from "./components/FloatingGenerator";
 import {generateYaml} from "./utils/yamlGenerator";
 
 export default function Home() {
@@ -63,6 +64,32 @@ export default function Home() {
           'glyphs fuse into blazing "YAML" sigil; bright flash → iris-out',
       },
     ],
+  });
+
+  const [lockState, setLockState] = useState<LockState>({
+    title: false,
+    synopsis: false,
+    visual_audio: {
+      visual: {
+        tone: false,
+        palette: false,
+        keyFX: false,
+        camera: false,
+        lighting: false,
+      },
+      aural: {
+        bgm: false,
+        sfx: false,
+        ambience: false,
+      },
+    },
+    spatial_layout: {
+      main: false,
+      foreground: false,
+      midground: false,
+      background: false,
+    },
+    time_axis: false,
   });
 
   const [selectedSegment, setSelectedSegment] = useState<TimeSegment | null>(
@@ -210,40 +237,156 @@ export default function Home() {
     });
   };
 
-  const handleGeneratedData = (data: {
-    visual_audio: {
-      visual: {
-        tone: string[];
-        palette: string;
-        keyFX: string;
-        camera: string;
-        lighting: string;
-      };
-      aural: {
-        bgm: string;
-        sfx: string;
-        ambience: string;
-      };
-    };
-    spatial_layout: {
-      main: string;
-      foreground: string;
-      midground: string;
-      background: string;
-    };
-    time_axis: Array<{
-      id: string;
-      startTime: number;
-      endTime: number;
-      action: string;
-    }>;
-  }) => {
-    setFormData((prev) => ({
-      ...prev,
-      visual_audio: data.visual_audio,
-      spatial_layout: data.spatial_layout,
-      time_axis: data.time_axis,
-    }));
+  // ロック状態を考慮した生成処理
+  const handleGeneratedData = (data: Partial<FormData>) => {
+    console.log("Received generated data:", data);
+    console.log("Current lock state:", lockState);
+
+    setFormData((prev) => {
+      const newData = {...prev};
+
+      // ロックされていない項目のみを更新
+      if (data.title !== undefined && !lockState.title) {
+        console.log("Updating title from:", prev.title, "to:", data.title);
+        newData.title = data.title;
+      }
+      if (data.synopsis !== undefined && !lockState.synopsis) {
+        console.log(
+          "Updating synopsis from:",
+          prev.synopsis,
+          "to:",
+          data.synopsis
+        );
+        newData.synopsis = data.synopsis;
+      }
+
+      // Visual Audio
+      if (data.visual_audio) {
+        if (
+          !lockState.visual_audio.visual.tone &&
+          data.visual_audio.visual.tone
+        ) {
+          newData.visual_audio.visual.tone = data.visual_audio.visual.tone;
+        }
+        if (
+          !lockState.visual_audio.visual.palette &&
+          data.visual_audio.visual.palette
+        ) {
+          newData.visual_audio.visual.palette =
+            data.visual_audio.visual.palette;
+        }
+        if (
+          !lockState.visual_audio.visual.keyFX &&
+          data.visual_audio.visual.keyFX
+        ) {
+          newData.visual_audio.visual.keyFX = data.visual_audio.visual.keyFX;
+        }
+        if (
+          !lockState.visual_audio.visual.camera &&
+          data.visual_audio.visual.camera
+        ) {
+          newData.visual_audio.visual.camera = data.visual_audio.visual.camera;
+        }
+        if (
+          !lockState.visual_audio.visual.lighting &&
+          data.visual_audio.visual.lighting
+        ) {
+          newData.visual_audio.visual.lighting =
+            data.visual_audio.visual.lighting;
+        }
+        if (!lockState.visual_audio.aural.bgm && data.visual_audio.aural.bgm) {
+          newData.visual_audio.aural.bgm = data.visual_audio.aural.bgm;
+        }
+        if (!lockState.visual_audio.aural.sfx && data.visual_audio.aural.sfx) {
+          newData.visual_audio.aural.sfx = data.visual_audio.aural.sfx;
+        }
+        if (
+          !lockState.visual_audio.aural.ambience &&
+          data.visual_audio.aural.ambience
+        ) {
+          newData.visual_audio.aural.ambience =
+            data.visual_audio.aural.ambience;
+        }
+      }
+
+      // Spatial Layout
+      if (data.spatial_layout) {
+        if (!lockState.spatial_layout.main && data.spatial_layout.main) {
+          newData.spatial_layout.main = data.spatial_layout.main;
+        }
+        if (
+          !lockState.spatial_layout.foreground &&
+          data.spatial_layout.foreground
+        ) {
+          newData.spatial_layout.foreground = data.spatial_layout.foreground;
+        }
+        if (
+          !lockState.spatial_layout.midground &&
+          data.spatial_layout.midground
+        ) {
+          newData.spatial_layout.midground = data.spatial_layout.midground;
+        }
+        if (
+          !lockState.spatial_layout.background &&
+          data.spatial_layout.background
+        ) {
+          newData.spatial_layout.background = data.spatial_layout.background;
+        }
+      }
+
+      // Time Axis
+      if (data.time_axis && !lockState.time_axis) {
+        newData.time_axis = data.time_axis;
+      }
+
+      return newData;
+    });
+  };
+
+  // ロック状態を切り替える関数
+  const handleLockToggle = (
+    section: string,
+    field: string,
+    subsection?: string
+  ) => {
+    setLockState((prev) => {
+      if (section === "title" || section === "synopsis") {
+        return {
+          ...prev,
+          [section]:
+            !prev[section as keyof Pick<LockState, "title" | "synopsis">],
+        };
+      } else if (section === "visual_audio") {
+        const subsectionKey = subsection as keyof LockState["visual_audio"];
+        const fieldKey =
+          field as keyof LockState["visual_audio"][typeof subsectionKey];
+        return {
+          ...prev,
+          visual_audio: {
+            ...prev.visual_audio,
+            [subsectionKey]: {
+              ...prev.visual_audio[subsectionKey],
+              [fieldKey]: !prev.visual_audio[subsectionKey][fieldKey],
+            },
+          },
+        };
+      } else if (section === "spatial_layout") {
+        const fieldKey = field as keyof LockState["spatial_layout"];
+        return {
+          ...prev,
+          spatial_layout: {
+            ...prev.spatial_layout,
+            [fieldKey]: !prev.spatial_layout[fieldKey],
+          },
+        };
+      } else if (section === "time_axis") {
+        return {
+          ...prev,
+          time_axis: !prev.time_axis,
+        };
+      }
+      return prev;
+    });
   };
 
   return (
@@ -260,7 +403,12 @@ export default function Home() {
             onSynopsisChange={(value) =>
               handleInputChange("synopsis", "synopsis", value)
             }
-            onGenerate={handleGeneratedData}
+            titleLocked={lockState.title}
+            synopsisLocked={lockState.synopsis}
+            onTitleLockToggle={() => handleLockToggle("title", "title")}
+            onSynopsisLockToggle={() =>
+              handleLockToggle("synopsis", "synopsis")
+            }
           />
 
           <VisualAudioSection
@@ -271,6 +419,10 @@ export default function Home() {
             onAuralChange={(field, value) =>
               handleNestedInputChange("visual_audio", "aural", field, value)
             }
+            lockState={lockState.visual_audio}
+            onLockToggle={(subsection, field) =>
+              handleLockToggle("visual_audio", field, subsection)
+            }
           />
 
           <SpatialLayoutSection
@@ -278,6 +430,8 @@ export default function Home() {
             onChange={(field, value) =>
               handleInputChange("spatial_layout", field, value)
             }
+            lockState={lockState.spatial_layout}
+            onLockToggle={(field) => handleLockToggle("spatial_layout", field)}
           />
 
           <TimeAxisSection
@@ -289,6 +443,8 @@ export default function Home() {
             onSegmentActionChange={handleSegmentActionChange}
             onTimeIncrement={handleTimeIncrement}
             onTimeDecrement={handleTimeDecrement}
+            locked={lockState.time_axis}
+            onLockToggle={() => handleLockToggle("time_axis", "time_axis")}
           />
 
           <button
@@ -307,6 +463,12 @@ export default function Home() {
           onCopy={handleCopyYaml}
         />
       </main>
+
+      <FloatingGenerator
+        formData={formData}
+        lockState={lockState}
+        onGenerate={handleGeneratedData}
+      />
     </div>
   );
 }

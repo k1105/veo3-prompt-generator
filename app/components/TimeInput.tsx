@@ -15,6 +15,8 @@ type TimeInputProps = {
     increment?: string;
     decrement?: string;
   };
+  locked?: boolean;
+  onLockToggle?: () => void;
 };
 
 export default function TimeInput({
@@ -24,6 +26,8 @@ export default function TimeInput({
   onDecrement,
   disabled = {},
   title = {},
+  locked = false,
+  onLockToggle,
 }: TimeInputProps) {
   const formatTimeForInput = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -34,14 +38,28 @@ export default function TimeInput({
 
   return (
     <div className={styles.inputGroup}>
-      <label htmlFor={`time-${label}`}>{label}:</label>
-      <div className={styles.timeCounter}>
+      <div className={styles.fieldHeader}>
+        <label htmlFor={`time-${label}`}>{label}:</label>
+        {onLockToggle && (
+          <button
+            type="button"
+            onClick={onLockToggle}
+            className={`${styles.lockButton} ${
+              locked ? styles.locked : styles.unlocked
+            }`}
+            title={locked ? "アンロック" : "ロック"}
+          >
+            {locked ? "🔒" : "🔓"}
+          </button>
+        )}
+      </div>
+      <div className={`${styles.timeCounter} ${locked ? styles.disabled : ""}`}>
         <button
           type="button"
           className={styles.timeButton}
           onClick={onDecrement}
-          disabled={disabled.decrement}
-          title={title.decrement}
+          disabled={disabled.decrement || locked}
+          title={locked ? "Time is locked" : title.decrement}
         >
           −
         </button>
@@ -50,8 +68,8 @@ export default function TimeInput({
           type="button"
           className={styles.timeButton}
           onClick={onIncrement}
-          disabled={disabled.increment}
-          title={title.increment}
+          disabled={disabled.increment || locked}
+          title={locked ? "Time is locked" : title.increment}
         >
           +
         </button>

@@ -12,6 +12,8 @@ type FormFieldProps = {
   type?: "text" | "textarea" | "select" | "checkbox";
   rows?: number;
   options?: ToneOption[];
+  locked?: boolean;
+  onLockToggle?: () => void;
 };
 
 export default function FormField({
@@ -23,11 +25,14 @@ export default function FormField({
   type = "text",
   rows = 1,
   options = [],
+  locked = false,
+  onLockToggle,
 }: FormFieldProps) {
   if (type === "checkbox") {
     const selectedValues = Array.isArray(value) ? value : [];
 
     const handleCheckboxChange = (optionValue: string, checked: boolean) => {
+      if (locked) return;
       if (checked) {
         onChange([...selectedValues, optionValue]);
       } else {
@@ -37,8 +42,24 @@ export default function FormField({
 
     return (
       <div className={styles.inputGroup}>
-        <label>{label}:</label>
-        <div className={styles.checkboxGrid}>
+        <div className={styles.fieldHeader}>
+          <label>{label}:</label>
+          {onLockToggle && (
+            <button
+              type="button"
+              onClick={onLockToggle}
+              className={`${styles.lockButton} ${
+                locked ? styles.locked : styles.unlocked
+              }`}
+              title={locked ? "アンロック" : "ロック"}
+            >
+              {locked ? "🔒" : "🔓"}
+            </button>
+          )}
+        </div>
+        <div
+          className={`${styles.checkboxGrid} ${locked ? styles.disabled : ""}`}
+        >
           {options.map((option) => (
             <label key={option.value} className={styles.checkboxItem}>
               <input
@@ -47,6 +68,7 @@ export default function FormField({
                 onChange={(e) =>
                   handleCheckboxChange(option.value, e.target.checked)
                 }
+                disabled={locked}
               />
               <span className={styles.checkboxLabel}>
                 <span className={styles.checkboxTitle}>{option.label}</span>
@@ -64,11 +86,27 @@ export default function FormField({
   if (type === "select") {
     return (
       <div className={styles.inputGroup}>
-        <label htmlFor={id}>{label}:</label>
+        <div className={styles.fieldHeader}>
+          <label htmlFor={id}>{label}:</label>
+          {onLockToggle && (
+            <button
+              type="button"
+              onClick={onLockToggle}
+              className={`${styles.lockButton} ${
+                locked ? styles.locked : styles.unlocked
+              }`}
+              title={locked ? "アンロック" : "ロック"}
+            >
+              {locked ? "🔒" : "🔓"}
+            </button>
+          )}
+        </div>
         <select
           id={id}
           value={value as string}
           onChange={(e) => onChange(e.target.value)}
+          disabled={locked}
+          className={locked ? styles.disabled : ""}
         >
           <option value="">選択してください</option>
           {options.map((option) => (
@@ -83,7 +121,21 @@ export default function FormField({
 
   return (
     <div className={styles.inputGroup}>
-      <label htmlFor={id}>{label}:</label>
+      <div className={styles.fieldHeader}>
+        <label htmlFor={id}>{label}:</label>
+        {onLockToggle && (
+          <button
+            type="button"
+            onClick={onLockToggle}
+            className={`${styles.lockButton} ${
+              locked ? styles.locked : styles.unlocked
+            }`}
+            title={locked ? "アンロック" : "ロック"}
+          >
+            {locked ? "🔒" : "🔓"}
+          </button>
+        )}
+      </div>
       {type === "textarea" ? (
         <textarea
           id={id}
@@ -91,6 +143,8 @@ export default function FormField({
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
           rows={rows}
+          disabled={locked}
+          className={locked ? styles.disabled : ""}
         />
       ) : (
         <input
@@ -99,6 +153,8 @@ export default function FormField({
           value={value as string}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
+          disabled={locked}
+          className={locked ? styles.disabled : ""}
         />
       )}
     </div>

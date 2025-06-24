@@ -210,5 +210,32 @@ export type FormData = {
   time_axis: TimeSegment[];
 };
 
+// ロック状態を管理する型
+export type LockState = {
+  title: boolean;
+  synopsis: boolean;
+  visual_audio: {
+    visual: {
+      tone: boolean;
+      palette: boolean;
+      keyFX: boolean;
+      camera: boolean;
+      lighting: boolean;
+    };
+    aural: {
+      bgm: boolean;
+      sfx: boolean;
+      ambience: boolean;
+    };
+  };
+  spatial_layout: {
+    main: boolean;
+    foreground: boolean;
+    midground: boolean;
+    background: boolean;
+  };
+  time_axis: boolean;
+};
+
 export type VisualAudioSection = FormData["visual_audio"];
 export type VisualAudioSubsection = keyof VisualAudioSection;

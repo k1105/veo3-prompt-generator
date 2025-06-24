@@ -209,8 +209,7 @@ a.secondary {
 }
 
 .form {
-  width: 100%;
-  max-width: 60vw;
+  width: 60vw;
   display: flex;
   flex-direction: column;
   gap: 32px;
@@ -250,11 +249,69 @@ a.secondary {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  margin-bottom: 16px;
+}
+
+.fieldHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.lockButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  min-height: 32px;
+}
+
+.lockButton.locked {
+  color: #e74c3c;
+  background-color: rgba(231, 76, 60, 0.1);
+}
+
+.lockButton.unlocked {
+  color: #27ae60;
+  background-color: rgba(39, 174, 96, 0.1);
+}
+
+.lockButton:hover {
+  transform: scale(1.1);
+}
+
+.lockButton.locked:hover {
+  background-color: rgba(231, 76, 60, 0.2);
+}
+
+.lockButton.unlocked:hover {
+  background-color: rgba(39, 174, 96, 0.2);
+}
+
+.disabled {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.disabled input,
+.disabled textarea,
+.disabled select {
+  background-color: #f5f5f5;
+  color: #666;
 }
 
 .inputGroup label {
-  font-size: 0.9rem;
-  font-weight: 500;
+  font-weight: 600;
+  margin-bottom: 8px;
+  display: block;
 }
 
 .inputGroup input,
@@ -521,4 +578,67 @@ a.secondary {
   line-height: 16px;
   color: var(--gray-alpha-200);
   opacity: 0.8;
+}
+
+.floatingGenerator {
+  position: fixed;
+  bottom: 32px;
+  right: 32px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.floatingGenerateButton {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 50px;
+  padding: 16px 32px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
+  transition: all 0.3s ease;
+  min-width: 200px;
+  text-align: center;
+}
+
+.floatingGenerateButton:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(102, 126, 234, 0.4);
+}
+
+.floatingGenerateButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.floatingGenerator .error {
+  background: rgba(231, 76, 60, 0.1);
+  color: #e74c3c;
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 1px solid rgba(231, 76, 60, 0.2);
+  font-size: 14px;
+  max-width: 300px;
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .floatingGenerator {
+    bottom: 20px;
+    right: 20px;
+    left: 20px;
+  }
+
+  .floatingGenerateButton {
+    width: 100%;
+    min-width: auto;
+    padding: 14px 24px;
+    font-size: 14px;
+  }
 }
