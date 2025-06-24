@@ -10,7 +10,7 @@ const formatTimeAxis = (segments: TimeSegment[]) => {
 };
 
 export const generateYaml = async (data: FormData): Promise<string> => {
-  // 翻訳用のコンテンツを準備
+  // 翻訳用のコンテンツを準備（最適化版）
   const contentToTranslate = {
     title: data.title || "",
     synopsis: data.synopsis || "",
@@ -39,24 +39,83 @@ export const generateYaml = async (data: FormData): Promise<string> => {
     })),
   };
 
-  try {
-    // 翻訳APIを呼び出し
-    const translateResponse = await fetch("/api/translate", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        content: JSON.stringify(contentToTranslate, null, 2),
-        type: "yaml",
-      }),
-    });
+  // リトライ機能付きの翻訳処理
+  const attemptTranslation = async (
+    retryCount = 0
+  ): Promise<{
+    title?: string;
+    synopsis?: string;
+    visual?: {
+      tone?: string;
+      palette?: string;
+      keyFX?: string;
+      camera?: string;
+      lighting?: string;
+    };
+    aural?: {
+      bgm?: string;
+      sfx?: string;
+      ambience?: string;
+    };
+    spatial?: {
+      main?: string;
+      foreground?: string;
+      midground?: string;
+      background?: string;
+    };
+    time_axis?: Array<{action?: string}>;
+  }> => {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000);
 
-    if (!translateResponse.ok) {
-      throw new Error("翻訳に失敗しました");
+      const translateResponse = await fetch("/api/translate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          content: JSON.stringify(contentToTranslate, null, 2),
+          type: "yaml",
+        }),
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!translateResponse.ok) {
+        // レート制限エラーの場合
+        if (
+          translateResponse.status === 429 ||
+          translateResponse.status === 503
+        ) {
+          if (retryCount < 3) {
+            console.log(
+              `Rate limit hit, retrying in ${(retryCount + 1) * 2} seconds...`
+            );
+            await new Promise((resolve) =>
+              setTimeout(resolve, (retryCount + 1) * 2000)
+            );
+            return attemptTranslation(retryCount + 1);
+          }
+        }
+        throw new Error(`翻訳に失敗しました: ${translateResponse.status}`);
+      }
+
+      return await translateResponse.json();
+    } catch (error) {
+      if (error instanceof Error && error.name === "AbortError") {
+        if (retryCount < 2) {
+          console.log(`Timeout, retrying... (attempt ${retryCount + 1})`);
+          return attemptTranslation(retryCount + 1);
+        }
+      }
+      throw error;
     }
+  };
 
-    const translatedData = await translateResponse.json();
+  try {
+    const translatedData = await attemptTranslation();
 
     // 翻訳されたデータからYAMLを生成
     const yaml = `title: "${translatedData.title || data.title || ""}"
@@ -110,6 +169,7 @@ ${data.time_axis
     return yaml;
   } catch (error) {
     console.error("Translation error:", error);
+
     // 翻訳に失敗した場合は元のコンテンツでYAMLを生成
     return `title: "${data.title || "YAML Arcane — Shadow Onmyoji"}"
 

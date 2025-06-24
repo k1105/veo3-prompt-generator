@@ -23,63 +23,53 @@ export async function POST(request: NextRequest) {
     let prompt = "";
 
     if (type === "yaml") {
-      // YAML生成用の構造化翻訳
+      // YAML生成用の構造化翻訳（最適化版）
       prompt = `
-以下の日本語の映画シーン記述を英語に翻訳してください。映画制作の専門用語を使用し、自然な英語で翻訳してください。
+日本語を英語に翻訳してください。映画制作の専門用語を使用してください。
 
 ${content}
 
-以下のJSON形式で回答してください：
+JSON形式で回答：
 {
-  "title": "英語のタイトル",
-  "synopsis": "英語のシノプシス",
+  "title": "英語タイトル",
+  "synopsis": "英語シノプシス",
   "visual": {
-    "tone": "英語のトーン",
-    "palette": "英語のパレット",
-    "keyFX": "英語のキーFX",
-    "camera": "英語のカメラワーク",
-    "lighting": "英語の照明"
+    "tone": "英語トーン",
+    "palette": "英語パレット",
+    "keyFX": "英語キーFX",
+    "camera": "英語カメラ",
+    "lighting": "英語照明"
   },
   "aural": {
-    "bgm": "英語のBGM",
-    "sfx": "英語のSFX",
-    "ambience": "英語の環境音"
+    "bgm": "英語BGM",
+    "sfx": "英語SFX",
+    "ambience": "英語環境音"
   },
   "spatial": {
-    "main": "英語のメイン",
-    "foreground": "英語の前景",
-    "midground": "英語の中景",
-    "background": "英語の背景"
+    "main": "英語メイン",
+    "foreground": "英語前景",
+    "midground": "英語中景",
+    "background": "英語背景"
   },
   "time_axis": [
-    {
-      "action": "英語のアクション1"
-    },
-    {
-      "action": "英語のアクション2"
-    },
-    {
-      "action": "英語のアクション3"
-    },
-    {
-      "action": "英語のアクション4"
-    }
+    {"action": "英語アクション1"},
+    {"action": "英語アクション2"},
+    {"action": "英語アクション3"},
+    {"action": "英語アクション4"}
   ]
 }
 `;
     } else {
-      // 一般的な翻訳
+      // 一般的な翻訳（最適化版）
       prompt = `
-以下の日本語の映画シーン記述を英語に翻訳してください。映画制作の専門用語を使用し、自然な英語で翻訳してください。
+日本語を英語に翻訳してください。映画制作の専門用語を使用してください。
 
 ${content}
-
-英語で回答してください。
 `;
     }
 
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
       {
         method: "POST",
         headers: {
@@ -99,7 +89,7 @@ ${content}
             temperature: 0.3,
             topK: 40,
             topP: 0.95,
-            maxOutputTokens: 2048,
+            maxOutputTokens: 1024, // トークン数を削減
           },
         }),
       }
@@ -130,22 +120,60 @@ ${content}
     const translatedText = data.candidates[0].content.parts[0].text;
 
     if (type === "yaml") {
-      // JSONを抽出（```json と ``` で囲まれている場合）
-      let jsonMatch = translatedText.match(/```json\s*([\s\S]*?)\s*```/);
-      if (!jsonMatch) {
-        // JSONブロックがない場合は、テキスト全体をJSONとして解析
-        jsonMatch = [null, translatedText];
-      }
-
+      // JSONを安全に抽出・解析
       try {
-        const parsedData = JSON.parse(jsonMatch[1]);
+        // 1. まず、```json ... ``` ブロックを探す
+        let jsonMatch = translatedText.match(/```json\s*([\s\S]*?)\s*```/);
+        if (!jsonMatch) {
+          // 2. ``` ... ``` ブロックを探す（json指定なし）
+          jsonMatch = translatedText.match(/```\s*([\s\S]*?)\s*```/);
+        }
+        if (!jsonMatch) {
+          // 3. { で始まり } で終わる部分を探す
+          jsonMatch = translatedText.match(/\{[\s\S]*\}/);
+        }
+        if (!jsonMatch) {
+          // 4. 最後の手段として、テキスト全体を試す
+          jsonMatch = [null, translatedText];
+        }
+
+        // JSONテキストをクリーンアップ
+        let jsonText = jsonMatch[1] || jsonMatch[0];
+        jsonText = jsonText
+          .trim()
+          .replace(/[\u0000-\u001F\u007F-\u009F]/g, "") // 制御文字を除去
+          .replace(/[ ]{2,}/g, " ") // 複数のスペースを単一に
+          .replace(/(?<="[^"]*)\n(?=[^"]*")/g, "\\n") // 文字列内の改行をエスケープ
+          .replace(/(?<="[^"]*)\r(?=[^"]*")/g, "\\r")
+          .replace(/(?<="[^"]*)\t(?=[^"]*")/g, "\\t");
+
+        const parsedData = JSON.parse(jsonText);
         return NextResponse.json(parsedData);
       } catch (parseError) {
         console.error("JSON parse error:", parseError);
-        return NextResponse.json(
-          {error: "翻訳されたコンテンツの解析に失敗しました"},
-          {status: 500}
-        );
+        console.error("Failed to parse translated text:", translatedText);
+
+        // より安全なJSONクリーンアップを試行
+        try {
+          const saferJsonText = translatedText
+            .replace(/[\u0000-\u001F\u007F-\u009F]/g, "")
+            .replace(/\\n/g, " ")
+            .replace(/\\r/g, " ")
+            .replace(/\\t/g, " ")
+            .replace(/\\\\/g, "\\")
+            .replace(/\\"/g, '"')
+            .replace(/[ ]{2,}/g, " ")
+            .trim();
+
+          const parsedData = JSON.parse(saferJsonText);
+          return NextResponse.json(parsedData);
+        } catch (secondParseError) {
+          console.error("Second JSON parse error:", secondParseError);
+          return NextResponse.json(
+            {error: "翻訳されたコンテンツの解析に失敗しました"},
+            {status: 500}
+          );
+        }
       }
     } else {
       return NextResponse.json({translated: translatedText});
