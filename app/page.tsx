@@ -2,44 +2,13 @@
 
 import {useState} from "react";
 import styles from "./page.module.css";
-import Timeline from "./components/Timeline";
-import AutoGenerator from "./components/AutoGenerator";
-
-type TimeSegment = {
-  id: string;
-  startTime: number;
-  endTime: number;
-  action: string;
-};
-
-type FormData = {
-  title: string;
-  synopsis: string;
-  visual_audio: {
-    visual: {
-      tone: string;
-      palette: string;
-      keyFX: string;
-      camera: string;
-      lighting: string;
-    };
-    aural: {
-      bgm: string;
-      sfx: string;
-      ambience: string;
-    };
-  };
-  spatial_layout: {
-    main: string;
-    foreground: string;
-    midground: string;
-    background: string;
-  };
-  time_axis: TimeSegment[];
-};
-
-type VisualAudioSection = FormData["visual_audio"];
-type VisualAudioSubsection = keyof VisualAudioSection;
+import {FormData, TimeSegment} from "./types";
+import BasicInfoSection from "./components/BasicInfoSection";
+import VisualAudioSection from "./components/VisualAudioSection";
+import SpatialLayoutSection from "./components/SpatialLayoutSection";
+import TimeAxisSection from "./components/TimeAxisSection";
+import YamlOutputSection from "./components/YamlOutputSection";
+import {generateYaml} from "./utils/yamlGenerator";
 
 export default function Home() {
   const [formData, setFormData] = useState<FormData>({
@@ -47,7 +16,7 @@ export default function Home() {
     synopsis: "",
     visual_audio: {
       visual: {
-        tone: "",
+        tone: [],
         palette: "",
         keyFX: "",
         camera: "",
@@ -111,15 +80,18 @@ export default function Home() {
   ) => {
     setFormData((prev) => ({
       ...prev,
-      [section]: value,
+      [section]:
+        section === "spatial_layout"
+          ? {...prev[section], [field]: value}
+          : value,
     }));
   };
 
   const handleNestedInputChange = (
     section: "visual_audio",
-    subsection: VisualAudioSubsection,
+    subsection: "visual" | "aural",
     field: string,
-    value: string
+    value: string | string[]
   ) => {
     setFormData((prev) => ({
       ...prev,
@@ -218,255 +190,6 @@ export default function Home() {
     handleSegmentTimeChange(field, currentValue - 0.1);
   };
 
-  const formatTimeForInput = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    const tenths = Math.floor((seconds % 1) * 10);
-    return `${mins}:${secs.toString().padStart(2, "0")}.${tenths}`;
-  };
-
-  const generateYaml = async (data: FormData): Promise<string> => {
-    const formatTimeAxis = (segments: TimeSegment[]) => {
-      return segments
-        .map(
-          (segment) =>
-            `- t: ${segment.startTime}–${segment.endTime} s\naction: ${segment.action}`
-        )
-        .join("\n");
-    };
-
-    // 翻訳用のコンテンツを準備
-    const contentToTranslate = {
-      title: data.title || "YAML Arcane — Shadow Onmyoji",
-      synopsis:
-        data.synopsis ||
-        'In a moon-drenched courtyard, a lone onmyoji-samurai unleashes the\narcane force hidden in the four letters "Y-A-M-L." Paper talismans\nignite, neon glyphs whirl, and a single katana stroke forges the\nglowing word across the night sky, sealing evil in an 8-second blaze\nof mystic style.',
-      visual: {
-        tone: data.visual_audio.visual.tone || "neo-feudal cool",
-        palette:
-          data.visual_audio.visual.palette ||
-          "indigo, obsidian, neon-turquoise, silver",
-        keyFX:
-          data.visual_audio.visual.keyFX ||
-          'plasma calligraphy glyphs "Y", "A", "M", "L" (60 px glow, cyan)',
-        camera:
-          data.visual_audio.visual.camera ||
-          "slow push-in → whip-pan on katana slash → hold on sky-borne sigil",
-        lighting:
-          data.visual_audio.visual.lighting ||
-          "lantern rim-lights, ground fog catching cyan reflections",
-      },
-      aural: {
-        bgm:
-          data.visual_audio.aural.bgm ||
-          "hybrid taiko × sub-bass groove, 100 BPM, –12 LUFS",
-        sfx:
-          data.visual_audio.aural.sfx ||
-          '- parchment flutter (close-mic, stereo)\n- sword draw "shing" (doppler rise)\n- electric glyph crackle (wide stereo panorama)',
-        ambience:
-          data.visual_audio.aural.ambience ||
-          "distant cicadas, cool night air (10 °C, 85 % RH)",
-      },
-      spatial: {
-        main:
-          data.spatial_layout.main ||
-          "onmyoji-samurai — raven-black kimono, silver lamellar plate, crow-feather\nhaori; left hand forms kuji-in mudra while right hand draws katana leaving\na neon cyan trail",
-        foreground:
-          data.spatial_layout.foreground ||
-          "glyph_particles: four rotating plasma letters (Y,A,M,L), 1 m orbit, clockwise",
-        midground:
-          data.spatial_layout.midground ||
-          "stone lanterns every 3 m, warm 2200 K glow on raked gravel",
-        background:
-          data.spatial_layout.background ||
-          "moss-stained vermilion torii, cedar silhouettes, thin crescent moon, drifting mist",
-      },
-      time_axis: data.time_axis.map((segment) => ({
-        action: segment.action,
-      })),
-    };
-
-    try {
-      // 翻訳APIを呼び出し
-      const translateResponse = await fetch("/api/translate", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          content: JSON.stringify(contentToTranslate, null, 2),
-          type: "yaml",
-        }),
-      });
-
-      if (!translateResponse.ok) {
-        throw new Error("翻訳に失敗しました");
-      }
-
-      const translatedData = await translateResponse.json();
-
-      // 翻訳されたデータからYAMLを生成
-      const yaml = `title: "${
-        translatedData.title || data.title || "YAML Arcane — Shadow Onmyoji"
-      }"
-
-synopsis: >
-${
-  translatedData.synopsis ||
-  data.synopsis ||
-  'In a moon-drenched courtyard, a lone onmyoji-samurai unleashes the\narcane force hidden in the four letters "Y-A-M-L." Paper talismans\nignite, neon glyphs whirl, and a single katana stroke forges the\nglowing word across the night sky, sealing evil in an 8-second blaze\nof mystic style.'
-}
-
-visual_audio: |
-Visual —
-tone: ${
-        translatedData.visual?.tone ||
-        data.visual_audio.visual.tone ||
-        "neo-feudal cool"
-      }; palette: ${
-        translatedData.visual?.palette ||
-        data.visual_audio.visual.palette ||
-        "indigo, obsidian, neon-turquoise, silver"
-      }
-key FX: ${
-        translatedData.visual?.keyFX ||
-        data.visual_audio.visual.keyFX ||
-        'plasma calligraphy glyphs "Y", "A", "M", "L" (60 px glow, cyan)'
-      }
-camera: ${
-        translatedData.visual?.camera ||
-        data.visual_audio.visual.camera ||
-        "slow push-in → whip-pan on katana slash → hold on sky-borne sigil"
-      }
-lighting: ${
-        translatedData.visual?.lighting ||
-        data.visual_audio.visual.lighting ||
-        "lantern rim-lights, ground fog catching cyan reflections"
-      }
-Aural —
-BGM: ${
-        translatedData.aural?.bgm ||
-        data.visual_audio.aural.bgm ||
-        "hybrid taiko × sub-bass groove, 100 BPM, –12 LUFS"
-      }
-SFX: ${
-        translatedData.aural?.sfx ||
-        data.visual_audio.aural.sfx ||
-        '- parchment flutter (close-mic, stereo)\n- sword draw "shing" (doppler rise)\n- electric glyph crackle (wide stereo panorama)'
-      }
-ambience: ${
-        translatedData.aural?.ambience ||
-        data.visual_audio.aural.ambience ||
-        "distant cicadas, cool night air (10 °C, 85 % RH)"
-      }
-
-spatial_layout:
-main: >
-${
-  translatedData.spatial?.main ||
-  data.spatial_layout.main ||
-  "onmyoji-samurai — raven-black kimono, silver lamellar plate, crow-feather\nhaori; left hand forms kuji-in mudra while right hand draws katana leaving\na neon cyan trail"
-}
-foreground:
-${
-  translatedData.spatial?.foreground ||
-  data.spatial_layout.foreground ||
-  "glyph_particles: four rotating plasma letters (Y,A,M,L), 1 m orbit, clockwise"
-}
-midground:
-${
-  translatedData.spatial?.midground ||
-  data.spatial_layout.midground ||
-  "stone lanterns every 3 m, warm 2200 K glow on raked gravel"
-}
-background:
-${
-  translatedData.spatial?.background ||
-  data.spatial_layout.background ||
-  "moss-stained vermilion torii, cedar silhouettes, thin crescent moon, drifting mist"
-}
-
-time_axis:
-${data.time_axis
-  .map(
-    (segment, index) =>
-      `- t: ${segment.startTime}–${segment.endTime} s\naction: ${
-        translatedData.time_axis?.[index]?.action || segment.action
-      }`
-  )
-  .join("\n")}`;
-
-      return yaml;
-    } catch (error) {
-      console.error("Translation error:", error);
-      // 翻訳に失敗した場合は元のコンテンツでYAMLを生成
-      return `title: "${data.title || "YAML Arcane — Shadow Onmyoji"}"
-
-synopsis: >
-${
-  data.synopsis ||
-  'In a moon-drenched courtyard, a lone onmyoji-samurai unleashes the\narcane force hidden in the four letters "Y-A-M-L." Paper talismans\nignite, neon glyphs whirl, and a single katana stroke forges the\nglowing word across the night sky, sealing evil in an 8-second blaze\nof mystic style.'
-}
-
-visual_audio: |
-Visual —
-tone: ${data.visual_audio.visual.tone || "neo-feudal cool"}; palette: ${
-        data.visual_audio.visual.palette ||
-        "indigo, obsidian, neon-turquoise, silver"
-      }
-key FX: ${
-        data.visual_audio.visual.keyFX ||
-        'plasma calligraphy glyphs "Y", "A", "M", "L" (60 px glow, cyan)'
-      }
-camera: ${
-        data.visual_audio.visual.camera ||
-        "slow push-in → whip-pan on katana slash → hold on sky-borne sigil"
-      }
-lighting: ${
-        data.visual_audio.visual.lighting ||
-        "lantern rim-lights, ground fog catching cyan reflections"
-      }
-Aural —
-BGM: ${
-        data.visual_audio.aural.bgm ||
-        "hybrid taiko × sub-bass groove, 100 BPM, –12 LUFS"
-      }
-SFX: ${
-        data.visual_audio.aural.sfx ||
-        '- parchment flutter (close-mic, stereo)\n- sword draw "shing" (doppler rise)\n- electric glyph crackle (wide stereo panorama)'
-      }
-ambience: ${
-        data.visual_audio.aural.ambience ||
-        "distant cicadas, cool night air (10 °C, 85 % RH)"
-      }
-
-spatial_layout:
-main: >
-${
-  data.spatial_layout.main ||
-  "onmyoji-samurai — raven-black kimono, silver lamellar plate, crow-feather\nhaori; left hand forms kuji-in mudra while right hand draws katana leaving\na neon cyan trail"
-}
-foreground:
-${
-  data.spatial_layout.foreground ||
-  "glyph_particles: four rotating plasma letters (Y,A,M,L), 1 m orbit, clockwise"
-}
-midground:
-${
-  data.spatial_layout.midground ||
-  "stone lanterns every 3 m, warm 2200 K glow on raked gravel"
-}
-background:
-${
-  data.spatial_layout.background ||
-  "moss-stained vermilion torii, cedar silhouettes, thin crescent moon, drifting mist"
-}
-
-time_axis:
-${formatTimeAxis(data.time_axis)}`;
-    }
-  };
-
   const handleCopyYaml = async () => {
     try {
       await navigator.clipboard.writeText(generatedYaml);
@@ -490,7 +213,7 @@ ${formatTimeAxis(data.time_axis)}`;
   const handleGeneratedData = (data: {
     visual_audio: {
       visual: {
-        tone: string;
+        tone: string[];
         palette: string;
         keyFX: string;
         camera: string;
@@ -523,357 +246,50 @@ ${formatTimeAxis(data.time_axis)}`;
     }));
   };
 
-  // Get the current selected segment from formData to ensure it's always up to date
-  const currentSelectedSegment = selectedSegment
-    ? formData.time_axis.find((segment) => segment.id === selectedSegment.id)
-    : null;
-
   return (
     <div className={styles.page}>
       <main className={styles.main}>
         <h1>YAML Scene Generator</h1>
         <form onSubmit={handleSubmit} className={styles.form}>
-          <section className={styles.formSection}>
-            <h2>Basic Information</h2>
-            <div className={styles.inputGroup}>
-              <label htmlFor="title">Title:</label>
-              <input
-                type="text"
-                id="title"
-                value={formData.title}
-                onChange={(e) =>
-                  handleInputChange("title", "title", e.target.value)
-                }
-                placeholder="Enter scene title"
-              />
-            </div>
-            <div className={styles.inputGroup}>
-              <label htmlFor="synopsis">Synopsis:</label>
-              <textarea
-                id="synopsis"
-                value={formData.synopsis}
-                onChange={(e) =>
-                  handleInputChange("synopsis", "synopsis", e.target.value)
-                }
-                placeholder="Enter scene synopsis"
-                rows={4}
-              />
-            </div>
-            <AutoGenerator
-              title={formData.title}
-              synopsis={formData.synopsis}
-              onGenerate={handleGeneratedData}
-            />
-          </section>
+          <BasicInfoSection
+            title={formData.title}
+            synopsis={formData.synopsis}
+            onTitleChange={(value) =>
+              handleInputChange("title", "title", value)
+            }
+            onSynopsisChange={(value) =>
+              handleInputChange("synopsis", "synopsis", value)
+            }
+            onGenerate={handleGeneratedData}
+          />
 
-          <section className={styles.formSection}>
-            <h2>Visual & Audio</h2>
-            <div className={styles.subSection}>
-              <h3>Visual</h3>
-              <div className={styles.inputGroup}>
-                <label htmlFor="tone">Tone:</label>
-                <input
-                  type="text"
-                  id="tone"
-                  value={formData.visual_audio.visual.tone}
-                  onChange={(e) =>
-                    handleNestedInputChange(
-                      "visual_audio",
-                      "visual",
-                      "tone",
-                      e.target.value
-                    )
-                  }
-                  placeholder="e.g., neo-feudal cool"
-                />
-              </div>
-              <div className={styles.inputGroup}>
-                <label htmlFor="palette">Palette:</label>
-                <input
-                  type="text"
-                  id="palette"
-                  value={formData.visual_audio.visual.palette}
-                  onChange={(e) =>
-                    handleNestedInputChange(
-                      "visual_audio",
-                      "visual",
-                      "palette",
-                      e.target.value
-                    )
-                  }
-                  placeholder="e.g., indigo, obsidian, neon-turquoise, silver"
-                />
-              </div>
-              <div className={styles.inputGroup}>
-                <label htmlFor="keyFX">Key FX:</label>
-                <input
-                  type="text"
-                  id="keyFX"
-                  value={formData.visual_audio.visual.keyFX}
-                  onChange={(e) =>
-                    handleNestedInputChange(
-                      "visual_audio",
-                      "visual",
-                      "keyFX",
-                      e.target.value
-                    )
-                  }
-                  placeholder="e.g., plasma calligraphy glyphs"
-                />
-              </div>
-              <div className={styles.inputGroup}>
-                <label htmlFor="camera">Camera:</label>
-                <input
-                  type="text"
-                  id="camera"
-                  value={formData.visual_audio.visual.camera}
-                  onChange={(e) =>
-                    handleNestedInputChange(
-                      "visual_audio",
-                      "visual",
-                      "camera",
-                      e.target.value
-                    )
-                  }
-                  placeholder="e.g., slow push-in → whip-pan"
-                />
-              </div>
-              <div className={styles.inputGroup}>
-                <label htmlFor="lighting">Lighting:</label>
-                <input
-                  type="text"
-                  id="lighting"
-                  value={formData.visual_audio.visual.lighting}
-                  onChange={(e) =>
-                    handleNestedInputChange(
-                      "visual_audio",
-                      "visual",
-                      "lighting",
-                      e.target.value
-                    )
-                  }
-                  placeholder="e.g., lantern rim-lights, ground fog"
-                />
-              </div>
-            </div>
-            <div className={styles.subSection}>
-              <h3>Aural</h3>
-              <div className={styles.inputGroup}>
-                <label htmlFor="bgm">BGM:</label>
-                <input
-                  type="text"
-                  id="bgm"
-                  value={formData.visual_audio.aural.bgm}
-                  onChange={(e) =>
-                    handleNestedInputChange(
-                      "visual_audio",
-                      "aural",
-                      "bgm",
-                      e.target.value
-                    )
-                  }
-                  placeholder="e.g., hybrid taiko × sub-bass groove"
-                />
-              </div>
-              <div className={styles.inputGroup}>
-                <label htmlFor="sfx">SFX:</label>
-                <textarea
-                  id="sfx"
-                  value={formData.visual_audio.aural.sfx}
-                  onChange={(e) =>
-                    handleNestedInputChange(
-                      "visual_audio",
-                      "aural",
-                      "sfx",
-                      e.target.value
-                    )
-                  }
-                  placeholder="e.g., parchment flutter, sword draw"
-                  rows={3}
-                />
-              </div>
-              <div className={styles.inputGroup}>
-                <label htmlFor="ambience">Ambience:</label>
-                <input
-                  type="text"
-                  id="ambience"
-                  value={formData.visual_audio.aural.ambience}
-                  onChange={(e) =>
-                    handleNestedInputChange(
-                      "visual_audio",
-                      "aural",
-                      "ambience",
-                      e.target.value
-                    )
-                  }
-                  placeholder="e.g., distant cicadas, cool night air"
-                />
-              </div>
-            </div>
-          </section>
+          <VisualAudioSection
+            visualAudio={formData.visual_audio}
+            onVisualChange={(field, value) =>
+              handleNestedInputChange("visual_audio", "visual", field, value)
+            }
+            onAuralChange={(field, value) =>
+              handleNestedInputChange("visual_audio", "aural", field, value)
+            }
+          />
 
-          <section className={styles.formSection}>
-            <h2>Spatial Layout</h2>
-            <div className={styles.inputGroup}>
-              <label htmlFor="main">Main:</label>
-              <textarea
-                id="main"
-                value={formData.spatial_layout.main}
-                onChange={(e) =>
-                  handleInputChange("spatial_layout", "main", e.target.value)
-                }
-                placeholder="Describe the main subject"
-                rows={3}
-              />
-            </div>
-            <div className={styles.inputGroup}>
-              <label htmlFor="foreground">Foreground:</label>
-              <textarea
-                id="foreground"
-                value={formData.spatial_layout.foreground}
-                onChange={(e) =>
-                  handleInputChange(
-                    "spatial_layout",
-                    "foreground",
-                    e.target.value
-                  )
-                }
-                placeholder="Describe foreground elements"
-                rows={2}
-              />
-            </div>
-            <div className={styles.inputGroup}>
-              <label htmlFor="midground">Midground:</label>
-              <textarea
-                id="midground"
-                value={formData.spatial_layout.midground}
-                onChange={(e) =>
-                  handleInputChange(
-                    "spatial_layout",
-                    "midground",
-                    e.target.value
-                  )
-                }
-                placeholder="Describe midground elements"
-                rows={2}
-              />
-            </div>
-            <div className={styles.inputGroup}>
-              <label htmlFor="background">Background:</label>
-              <textarea
-                id="background"
-                value={formData.spatial_layout.background}
-                onChange={(e) =>
-                  handleInputChange(
-                    "spatial_layout",
-                    "background",
-                    e.target.value
-                  )
-                }
-                placeholder="Describe background elements"
-                rows={2}
-              />
-            </div>
-          </section>
+          <SpatialLayoutSection
+            spatialLayout={formData.spatial_layout}
+            onChange={(field, value) =>
+              handleInputChange("spatial_layout", field, value)
+            }
+          />
 
-          <section className={styles.formSection}>
-            <h2>Time Axis</h2>
-            <Timeline
-              totalDuration={8}
-              segments={formData.time_axis}
-              onSegmentChange={handleTimeAxisChange}
-              onSegmentSelect={handleSegmentSelect}
-              selectedSegmentId={selectedSegment?.id || null}
-            />
-            {currentSelectedSegment && (
-              <div className={styles.segmentEditor}>
-                <h3>
-                  Edit Segment:{" "}
-                  {formatTimeForInput(currentSelectedSegment.startTime)} -{" "}
-                  {formatTimeForInput(currentSelectedSegment.endTime)}
-                </h3>
-                <div className={styles.timeInputs}>
-                  <div className={styles.inputGroup}>
-                    <label htmlFor="startTime">Start Time:</label>
-                    <div className={styles.timeCounter}>
-                      <button
-                        type="button"
-                        className={styles.timeButton}
-                        onClick={() => handleTimeDecrement("startTime")}
-                        disabled={
-                          currentSelectedSegment.startTime <= 0 ||
-                          currentSelectedSegment.startTime >=
-                            currentSelectedSegment.endTime - 0.1
-                        }
-                        title="Decrease start time by 0.1s (disabled at 0.0s or when too close to end time)"
-                      >
-                        −
-                      </button>
-                      <span className={styles.timeDisplay}>
-                        {formatTimeForInput(currentSelectedSegment.startTime)}
-                      </span>
-                      <button
-                        type="button"
-                        className={styles.timeButton}
-                        onClick={() => handleTimeIncrement("startTime")}
-                        disabled={
-                          currentSelectedSegment.startTime >=
-                            currentSelectedSegment.endTime - 0.1 ||
-                          currentSelectedSegment.startTime <= 0
-                        }
-                        title="Increase start time by 0.1s (disabled when too close to end time or at 0.0s)"
-                      >
-                        +
-                      </button>
-                    </div>
-                  </div>
-                  <div className={styles.inputGroup}>
-                    <label htmlFor="endTime">End Time:</label>
-                    <div className={styles.timeCounter}>
-                      <button
-                        type="button"
-                        className={styles.timeButton}
-                        onClick={() => handleTimeDecrement("endTime")}
-                        disabled={
-                          currentSelectedSegment.endTime <=
-                            currentSelectedSegment.startTime + 0.1 ||
-                          currentSelectedSegment.endTime >= 8
-                        }
-                        title="Decrease end time by 0.1s (disabled when too close to start time or at 8.0s)"
-                      >
-                        −
-                      </button>
-                      <span className={styles.timeDisplay}>
-                        {formatTimeForInput(currentSelectedSegment.endTime)}
-                      </span>
-                      <button
-                        type="button"
-                        className={styles.timeButton}
-                        onClick={() => handleTimeIncrement("endTime")}
-                        disabled={
-                          currentSelectedSegment.endTime >= 8 ||
-                          currentSelectedSegment.startTime <= 0
-                        }
-                        title="Increase end time by 0.1s (disabled at 8.0s or when start time is 0.0s)"
-                      >
-                        +
-                      </button>
-                    </div>
-                  </div>
-                </div>
-                <div className={styles.inputGroup}>
-                  <label htmlFor="segmentAction">Action:</label>
-                  <textarea
-                    id="segmentAction"
-                    value={currentSelectedSegment.action}
-                    onChange={(e) => handleSegmentActionChange(e.target.value)}
-                    placeholder="Describe the action for this time segment"
-                    rows={3}
-                  />
-                </div>
-              </div>
-            )}
-          </section>
+          <TimeAxisSection
+            totalDuration={8}
+            segments={formData.time_axis}
+            selectedSegment={selectedSegment}
+            onSegmentChange={handleTimeAxisChange}
+            onSegmentSelect={handleSegmentSelect}
+            onSegmentActionChange={handleSegmentActionChange}
+            onTimeIncrement={handleTimeIncrement}
+            onTimeDecrement={handleTimeDecrement}
+          />
 
           <button
             type="submit"
@@ -884,21 +300,12 @@ ${formatTimeAxis(data.time_axis)}`;
           </button>
         </form>
 
-        {showYaml && (
-          <section className={styles.yamlSection}>
-            <div className={styles.yamlHeader}>
-              <h2>Generated YAML</h2>
-              <button
-                type="button"
-                onClick={handleCopyYaml}
-                className={styles.copyButton}
-              >
-                {copySuccess ? "Copied!" : "Copy YAML"}
-              </button>
-            </div>
-            <pre className={styles.yamlOutput}>{generatedYaml}</pre>
-          </section>
-        )}
+        <YamlOutputSection
+          yaml={generatedYaml}
+          showYaml={showYaml}
+          copySuccess={copySuccess}
+          onCopy={handleCopyYaml}
+        />
       </main>
     </div>
   );

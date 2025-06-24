@@ -2,6 +2,7 @@
 
 import {useState} from "react";
 import styles from "../page.module.css";
+import {SpatialLayout, TimeSegment, TONE_OPTIONS} from "../types";
 
 type AutoGeneratorProps = {
   title: string;
@@ -9,7 +10,7 @@ type AutoGeneratorProps = {
   onGenerate: (data: {
     visual_audio: {
       visual: {
-        tone: string;
+        tone: string[];
         palette: string;
         keyFX: string;
         camera: string;
@@ -21,18 +22,8 @@ type AutoGeneratorProps = {
         ambience: string;
       };
     };
-    spatial_layout: {
-      main: string;
-      foreground: string;
-      midground: string;
-      background: string;
-    };
-    time_axis: Array<{
-      id: string;
-      startTime: number;
-      endTime: number;
-      action: string;
-    }>;
+    spatial_layout: SpatialLayout;
+    time_axis: TimeSegment[];
   }) => void;
 };
 
@@ -54,8 +45,13 @@ export default function AutoGenerator({
     setError(null);
 
     try {
+      const availableTones = TONE_OPTIONS.map(
+        (option) => `"${option.value}"`
+      ).join(", ");
+
       const prompt = `
 以下の映画シーンの基本情報を基に、視覚・音響と空間レイアウトの詳細を生成してください。また、8秒間を4つのセグメントに分けたタイムラインも作成してください。
+**Try to think of the most creative, impressive and delightful prompts. Think about scenes which are satisfying to watch.**
 
 タイトル: ${title || "未設定"}
 シノプシス: ${synopsis || "未設定"}
@@ -65,16 +61,16 @@ export default function AutoGenerator({
 {
   "visual_audio": {
     "visual": {
-      "tone": "視覚的なトーン（例：neo-feudal cool）",
-      "palette": "カラーパレット（例：indigo, obsidian, neon-turquoise, silver）",
-      "keyFX": "主要な視覚効果（例：plasma calligraphy glyphs）",
-      "camera": "カメラワーク（例：slow push-in → whip-pan）",
-      "lighting": "照明（例：lantern rim-lights, ground fog）"
+      "tone": ["選択されたトーンの配列（以下の値から1-3個選択）"],
+      "palette": "カラーパレット（例：インディゴ、オブシディアン、ネオンティール、シルバー）",
+      "keyFX": "主要な視覚効果（例：プラズマ書道グリフ）",
+      "camera": "カメラワーク（例：スローピューシュイン → ウィップパン）",
+      "lighting": "照明（例：ランタンリムライト、グラウンドフォグ）"
     },
     "aural": {
-      "bgm": "背景音楽（例：hybrid taiko × sub-bass groove, 100 BPM）",
-      "sfx": "効果音（例：parchment flutter, sword draw）",
-      "ambience": "環境音（例：distant cicadas, cool night air）"
+      "bgm": "背景音楽（例：ハイブリッド太鼓 × サブベースグルーヴ、100 BPM）",
+      "sfx": "効果音（例：羊皮紙のひらめき、刀の抜刀音）",
+      "ambience": "環境音（例：遠くのセミの声、涼しい夜の空気）"
     }
   },
   "spatial_layout": {
@@ -111,7 +107,13 @@ export default function AutoGenerator({
   ]
 }
 
-日本語で回答し、映画制作の専門的な用語を使用してください。タイムラインのセグメントは論理的に流れるようにし、8秒間全体をカバーするようにしてください。
+重要：
+1. toneフィールドには以下の値から1-3個を選択して配列として指定してください。これらの値以外は使用しないでください：
+[${availableTones}]
+
+2. すべてのフィールド（palette、keyFX、camera、lighting、bgm、sfx、ambience、spatial_layout、time_axis）で日本語を使用してください。英語は使用しないでください。
+
+3. 映画制作の専門的な用語を使用し、タイムラインのセグメントは論理的に流れるようにし、8秒間全体をカバーするようにしてください。
 `;
 
       const response = await fetch("/api/generate", {
@@ -127,6 +129,38 @@ export default function AutoGenerator({
       }
 
       const data = await response.json();
+
+      // toneフィールドの検証とフィルタリング
+      if (
+        data.visual_audio &&
+        data.visual_audio.visual &&
+        data.visual_audio.visual.tone
+      ) {
+        const validToneValues = TONE_OPTIONS.map((option) => option.value);
+        const originalTone = data.visual_audio.visual.tone;
+
+        // 配列でない場合は配列に変換
+        const toneArray = Array.isArray(originalTone)
+          ? originalTone
+          : [originalTone];
+
+        // 有効な値のみをフィルタリング
+        const filteredTone = toneArray.filter((tone) =>
+          validToneValues.includes(tone)
+        );
+
+        // フィルタリングされたデータで更新
+        data.visual_audio.visual.tone = filteredTone;
+
+        // 無効な値があった場合はコンソールに警告
+        if (filteredTone.length !== toneArray.length) {
+          console.warn(
+            "Invalid tone values filtered out:",
+            toneArray.filter((tone) => !validToneValues.includes(tone))
+          );
+        }
+      }
+
       onGenerate(data);
     } catch (err) {
       setError(

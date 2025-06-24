@@ -2,13 +2,7 @@
 
 import {useState, useRef, useEffect} from "react";
 import styles from "./Timeline.module.css";
-
-type TimeSegment = {
-  id: string;
-  startTime: number;
-  endTime: number;
-  action: string;
-};
+import {TimeSegment} from "../types";
 
 type TimelineProps = {
   totalDuration: number;

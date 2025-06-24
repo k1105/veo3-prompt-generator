@@ -1,7 +1,9 @@
 .page {
   --gray-rgb: 0, 0, 0;
+  --blue-rgb: 7, 172, 204;
   --gray-alpha-200: rgba(var(--gray-rgb), 0.08);
   --gray-alpha-100: rgba(var(--gray-rgb), 0.05);
+  --blue-alpha-100: rgba(var(--blue-rgb), 0.5);
 
   --button-primary-hover: #383838;
   --button-secondary-hover: #f2f2f2;
@@ -208,7 +210,7 @@ a.secondary {
 
 .form {
   width: 100%;
-  max-width: 800px;
+  max-width: 60vw;
   display: flex;
   flex-direction: column;
   gap: 32px;
@@ -256,19 +258,26 @@ a.secondary {
 }
 
 .inputGroup input,
-.inputGroup textarea {
+.inputGroup textarea,
+.inputGroup select {
+  width: 100%;
   padding: 8px 12px;
   border: 1px solid var(--gray-alpha-200);
   border-radius: 6px;
-  font-size: 1rem;
+  font-size: 14px;
+  line-height: 20px;
   background: var(--background);
   color: var(--foreground);
-  width: 100%;
+  transition: border-color 0.2s;
+}
+
+.inputGroup textarea {
   resize: vertical;
 }
 
 .inputGroup input:focus,
-.inputGroup textarea:focus {
+.inputGroup textarea:focus,
+.inputGroup select:focus {
   outline: none;
   border-color: var(--foreground);
 }
@@ -460,4 +469,56 @@ a.secondary {
   background: rgba(211, 47, 47, 0.1);
   border-radius: 4px;
   border: 1px solid rgba(211, 47, 47, 0.2);
+}
+
+.checkboxGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.checkboxItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 8px;
+  border: 1px solid var(--gray-alpha-200);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.checkboxItem:hover {
+  background-color: var(--gray-alpha-100);
+}
+
+.checkboxItem:has(input[type="checkbox"]:checked) {
+  background-color: var(--blue-alpha-100);
+}
+
+.checkboxItem input[type="checkbox"] {
+  display: none;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.checkboxLabel {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.checkboxTitle {
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 18px;
+}
+
+.checkboxJapanese {
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--gray-alpha-200);
+  opacity: 0.8;
 }
