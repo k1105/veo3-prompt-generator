@@ -1,5 +1,86 @@
 import {NextRequest, NextResponse} from "next/server";
 
+// JSONを安全に抽出・解析する関数
+function extractAndParseJSON(text: string) {
+  console.log("Original generated text:", text);
+
+  // 1. まず、```json ... ``` ブロックを探す
+  let jsonMatch = text.match(/```json\s*([\s\S]*?)\s*```/);
+  if (jsonMatch) {
+    console.log("Found JSON block");
+    return cleanAndParseJSON(jsonMatch[1]);
+  }
+
+  // 2. ``` ... ``` ブロックを探す（json指定なし）
+  jsonMatch = text.match(/```\s*([\s\S]*?)\s*```/);
+  if (jsonMatch) {
+    console.log("Found code block");
+    return cleanAndParseJSON(jsonMatch[1]);
+  }
+
+  // 3. { で始まり } で終わる部分を探す
+  const braceMatch = text.match(/\{[\s\S]*\}/);
+  if (braceMatch) {
+    console.log("Found JSON-like content");
+    return cleanAndParseJSON(braceMatch[0]);
+  }
+
+  // 4. 最後の手段として、テキスト全体を試す
+  console.log("Trying entire text");
+  return cleanAndParseJSON(text);
+}
+
+function cleanAndParseJSON(jsonText: string) {
+  console.log("Raw JSON text:", jsonText);
+
+  // 基本的なクリーンアップ
+  const cleaned = jsonText
+    .trim()
+    // 制御文字を除去（文字列内は保持）
+    .replace(/[\u0000-\u001F\u007F-\u009F]/g, "")
+    // 複数のスペースを単一に
+    .replace(/[ ]{2,}/g, " ")
+    // 文字列内の改行をエスケープ
+    .replace(/(?<="[^"]*)\n(?=[^"]*")/g, "\\n")
+    .replace(/(?<="[^"]*)\r(?=[^"]*")/g, "\\r")
+    .replace(/(?<="[^"]*)\t(?=[^"]*")/g, "\\t");
+
+  console.log("Cleaned JSON text:", cleaned);
+
+  try {
+    const parsed = JSON.parse(cleaned);
+    console.log("Successfully parsed JSON");
+    return parsed;
+  } catch (error) {
+    console.error("First parse attempt failed:", error);
+
+    // より積極的なクリーンアップ
+    const safer = cleaned
+      .replace(/\\n/g, " ")
+      .replace(/\\r/g, " ")
+      .replace(/\\t/g, " ")
+      .replace(/\\\\/g, "\\")
+      .replace(/\\"/g, '"')
+      .replace(/[ ]{2,}/g, " ")
+      .trim();
+
+    console.log("Safer JSON text:", safer);
+
+    try {
+      const parsed = JSON.parse(safer);
+      console.log("Successfully parsed JSON with safer cleanup");
+      return parsed;
+    } catch (secondError) {
+      console.error("Second parse attempt failed:", secondError);
+      throw new Error(
+        `JSON parsing failed: ${
+          secondError instanceof Error ? secondError.message : "Unknown error"
+        }`
+      );
+    }
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const {prompt} = await request.json();
@@ -18,7 +99,7 @@ export async function POST(request: NextRequest) {
     }
 
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
       {
         method: "POST",
         headers: {
@@ -38,7 +119,7 @@ export async function POST(request: NextRequest) {
             temperature: 0.7,
             topK: 40,
             topP: 0.95,
-            maxOutputTokens: 2048,
+            maxOutputTokens: 1024,
           },
         }),
       }
@@ -68,25 +149,26 @@ export async function POST(request: NextRequest) {
 
     const generatedText = data.candidates[0].content.parts[0].text;
 
-    // JSONを抽出（```json と ``` で囲まれている場合）
-    let jsonMatch = generatedText.match(/```json\s*([\s\S]*?)\s*```/);
-    if (!jsonMatch) {
-      // JSONブロックがない場合は、テキスト全体をJSONとして解析
-      jsonMatch = [null, generatedText];
-    }
+    const parsedData = extractAndParseJSON(generatedText);
 
-    try {
-      const parsedData = JSON.parse(jsonMatch[1]);
-      return NextResponse.json(parsedData);
-    } catch (parseError) {
-      console.error("JSON parse error:", parseError);
+    return NextResponse.json(parsedData);
+  } catch (error) {
+    console.error("API error:", error);
+
+    // JSON解析エラーの場合は特別なメッセージを返す
+    if (
+      error instanceof Error &&
+      error.message.includes("JSON parsing failed")
+    ) {
       return NextResponse.json(
-        {error: "生成されたコンテンツの解析に失敗しました"},
+        {
+          error:
+            "生成されたコンテンツの解析に失敗しました。AIの応答形式に問題がある可能性があります。",
+        },
         {status: 500}
       );
     }
-  } catch (error) {
-    console.error("API error:", error);
+
     return NextResponse.json(
       {error: "サーバーエラーが発生しました"},
       {status: 500}

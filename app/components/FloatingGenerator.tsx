@@ -48,10 +48,6 @@ export default function FloatingGenerator({
     setError(null);
 
     try {
-      const availableTones = TONE_OPTIONS.map(
-        (option) => `"${option.value}"`
-      ).join(", ");
-
       // ロックされた項目の情報を収集
       const lockedInfo = {
         title: lockState.title ? formData.title : null,
@@ -104,36 +100,17 @@ export default function FloatingGenerator({
       };
 
       const prompt = `
-以下の映画シーンの情報を基に、ロックされていない項目のみを生成してください。ロックされた項目は変更せず、それらの情報を踏まえてアンロックされた項目を補完してください。
-**Try to think of the most creative, impressive and delightful prompts. Think about scenes which are satisfying to watch.**
+ロックされていない項目のみを生成してください。ロックされた項目は変更せず、一貫性のある内容を生成してください。
 
-## 現在の設定（ロックされた項目）：
+現在の設定：
 タイトル: ${lockedInfo.title || "未設定"}
 シノプシス: ${lockedInfo.synopsis || "未設定"}
 
-視覚・音響設定:
-- トーン: ${
-        lockedInfo.visual_audio.visual.tone
-          ? JSON.stringify(lockedInfo.visual_audio.visual.tone)
-          : "未設定"
-      }
-- パレット: ${lockedInfo.visual_audio.visual.palette || "未設定"}
-- 主要効果: ${lockedInfo.visual_audio.visual.keyFX || "未設定"}
-- カメラ: ${lockedInfo.visual_audio.visual.camera || "未設定"}
-- 照明: ${lockedInfo.visual_audio.visual.lighting || "未設定"}
-- BGM: ${lockedInfo.visual_audio.aural.bgm || "未設定"}
-- 効果音: ${lockedInfo.visual_audio.aural.sfx || "未設定"}
-- 環境音: ${lockedInfo.visual_audio.aural.ambience || "未設定"}
-
-空間レイアウト:
-- メイン: ${lockedInfo.spatial_layout.main || "未設定"}
-- 前景: ${lockedInfo.spatial_layout.foreground || "未設定"}
-- 中景: ${lockedInfo.spatial_layout.midground || "未設定"}
-- 背景: ${lockedInfo.spatial_layout.background || "未設定"}
-
+視覚・音響: ${lockedInfo.visual_audio.visual.tone ? "設定済み" : "未設定"}
+空間レイアウト: ${lockedInfo.spatial_layout.main ? "設定済み" : "未設定"}
 タイムライン: ${lockedInfo.time_axis ? "設定済み" : "未設定"}
 
-以下の形式でJSONで回答してください。ロックされた項目は既存の値をそのまま使用し、アンロックされた項目のみを生成してください：
+以下のJSON形式で回答してください：
 
 {
   "title": "${lockedInfo.title || "生成されたタイトル"}",
@@ -143,7 +120,7 @@ export default function FloatingGenerator({
       "tone": ${
         lockedInfo.visual_audio.visual.tone
           ? JSON.stringify(lockedInfo.visual_audio.visual.tone)
-          : '["生成されたトーン"]'
+          : '["cinematic film of", "anime style"]'
       },
       "palette": "${
         lockedInfo.visual_audio.visual.palette || "生成されたパレット"
@@ -176,47 +153,19 @@ export default function FloatingGenerator({
     lockedInfo.time_axis
       ? JSON.stringify(lockedInfo.time_axis)
       : `[
-    {
-      "id": "1",
-      "startTime": 0.0,
-      "endTime": 2.0,
-      "action": "生成されたアクション1"
-    },
-    {
-      "id": "2",
-      "startTime": 2.0,
-      "endTime": 4.0,
-      "action": "生成されたアクション2"
-    },
-    {
-      "id": "3",
-      "startTime": 4.0,
-      "endTime": 6.0,
-      "action": "生成されたアクション3"
-    },
-    {
-      "id": "4",
-      "startTime": 6.0,
-      "endTime": 8.0,
-      "action": "生成されたアクション4"
-    }
+    {"id": "1", "startTime": 0.0, "endTime": 2.0, "action": "生成されたアクション1"},
+    {"id": "2", "startTime": 2.0, "endTime": 4.0, "action": "生成されたアクション2"},
+    {"id": "3", "startTime": 4.0, "endTime": 6.0, "action": "生成されたアクション3"},
+    {"id": "4", "startTime": 6.0, "endTime": 8.0, "action": "生成されたアクション4"}
   ]`
   }
 }
 
 重要：
-1. toneフィールドには以下の値から1-3個を選択して配列として指定してください。これらの値以外は使用しないでください：
-[${availableTones}]
-
-2. すべてのフィールドで日本語を使用してください。英語は使用しないでください。
-
-3. ロックされた項目の値は変更せず、そのまま使用してください。
-
-4. アンロックされた項目は、ロックされた項目の情報を踏まえて一貫性のある内容を生成してください。
-
-5. 映画制作の専門的な用語を使用し、タイムラインのセグメントは論理的に流れるようにし、8秒間全体をカバーするようにしてください。
-
-6. タイトルとシノプシスがアンロックされている場合は、シノプシスの内容に基づいて適切なタイトルを生成してください。
+1. 日本語で回答
+2. ロックされた項目は変更しない
+3. 映画制作の専門用語を使用
+4. 一貫性のある内容を生成
 `;
 
       const response = await fetch("/api/generate", {
