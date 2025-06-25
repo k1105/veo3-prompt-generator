@@ -8,15 +8,19 @@ type FloatingGeneratorProps = {
   formData: FormData;
   lockState: LockState;
   onGenerate: (data: Partial<FormData>) => void;
+  apiKey?: string;
 };
 
 export default function FloatingGenerator({
   formData,
   lockState,
   onGenerate,
+  apiKey,
 }: FloatingGeneratorProps) {
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showInstructions, setShowInstructions] = useState(false);
+  const [instructions, setInstructions] = useState("");
 
   const generateContent = async () => {
     // ロックされていない項目があるかチェック
@@ -99,8 +103,12 @@ export default function FloatingGenerator({
         time_axis: lockState.time_axis ? formData.time_axis : null,
       };
 
+      const instructionText = instructions.trim()
+        ? `\n\n特別な指示：${instructions}`
+        : "";
+
       const prompt = `
-ロックされていない項目のみを生成してください。ロックされた項目は変更せず、一貫性のある内容を生成してください。
+ロックされていない項目のみを生成してください。ロックされた項目は変更せず、一貫性のある内容を生成してください。${instructionText}
 
 現在の設定：
 タイトル: ${lockedInfo.title || "未設定"}
@@ -173,7 +181,10 @@ export default function FloatingGenerator({
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({prompt}),
+        body: JSON.stringify({
+          prompt,
+          customApiKey: apiKey,
+        }),
       });
 
       if (!response.ok) {
@@ -229,13 +240,47 @@ export default function FloatingGenerator({
 
   return (
     <div className={styles.floatingGenerator}>
+      {showInstructions && (
+        <div className={styles.floatingInstructions}>
+          <textarea
+            value={instructions}
+            onChange={(e) => setInstructions(e.target.value)}
+            placeholder="例：全体的に明るいトーンにして、ポップなプロットに書き換えて..."
+            className={styles.instructionsTextarea}
+            rows={3}
+          />
+          <div className={styles.instructionsButtons}>
+            <button
+              type="button"
+              onClick={() => setShowInstructions(false)}
+              className={styles.closeInstructionsButton}
+            >
+              閉じる
+            </button>
+            <button
+              type="button"
+              onClick={() => setInstructions("")}
+              className={styles.clearInstructionsButton}
+            >
+              クリア
+            </button>
+          </div>
+        </div>
+      )}
+      <button
+        type="button"
+        onClick={() => setShowInstructions(!showInstructions)}
+        className={styles.toggleInstructionsButton}
+      >
+        {showInstructions ? "指示を隠す" : "指示を表示"}
+      </button>
       <button
         type="button"
         onClick={generateContent}
         disabled={isGenerating}
         className={styles.floatingGenerateButton}
       >
-        {isGenerating ? "生成中..." : "Fill Unlocked Fields"}
+        {isGenerating ? "生成中..." : "Fill / Update Fields"}
       </button>
       {error && <div className={styles.error}>{error}</div>}
     </div>

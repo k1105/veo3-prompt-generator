@@ -5,9 +5,6 @@
   --gray-alpha-100: rgba(var(--gray-rgb), 0.05);
   --blue-alpha-100: rgba(var(--blue-rgb), 0.5);
 
-  --button-primary-hover: #383838;
-  --button-secondary-hover: #f2f2f2;
-
   display: grid;
   grid-template-rows: 20px 1fr 20px;
   align-items: start;
@@ -23,9 +20,6 @@
     --gray-rgb: 255, 255, 255;
     --gray-alpha-200: rgba(var(--gray-rgb), 0.145);
     --gray-alpha-100: rgba(var(--gray-rgb), 0.06);
-
-    --button-primary-hover: #ccc;
-    --button-secondary-hover: #1a1a1a;
   }
 }
 
@@ -254,46 +248,154 @@ a.secondary {
 
 .fieldHeader {
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
   margin-bottom: 8px;
+}
+
+.fieldButtons {
+  display: flex;
+  gap: 8px;
+  align-items: center;
 }
 
 .lockButton {
   background: none;
   border: none;
   cursor: pointer;
-  font-size: 16px;
   padding: 4px;
   border-radius: 4px;
-  transition: all 0.2s ease;
+  font-size: 16px;
+  transition: background-color 0.2s;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-width: 32px;
-  min-height: 32px;
+  min-width: 28px;
+  height: 28px;
 }
 
 .lockButton.locked {
-  color: #e74c3c;
-  background-color: rgba(231, 76, 60, 0.1);
+  color: var(--error-light);
 }
 
 .lockButton.unlocked {
-  color: #27ae60;
-  background-color: rgba(39, 174, 96, 0.1);
+  color: var(--success-light);
 }
 
 .lockButton:hover {
-  transform: scale(1.1);
+  background-color: var(--gray-alpha-100);
 }
 
 .lockButton.locked:hover {
-  background-color: rgba(231, 76, 60, 0.2);
+  background-color: rgba(255, 107, 107, 0.1);
 }
 
 .lockButton.unlocked:hover {
-  background-color: rgba(39, 174, 96, 0.2);
+  background-color: rgba(81, 207, 102, 0.1);
+}
+
+.updateButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  font-size: 16px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 28px;
+  color: var(--primary-light);
+}
+
+.updateButton:hover:not(:disabled) {
+  background-color: rgba(51, 154, 240, 0.1);
+  transform: scale(1.05);
+}
+
+.updateButton.updating {
+  animation: spin 1s linear infinite;
+  color: var(--secondary-light);
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.updateButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.directionInput {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+  align-items: center;
+  padding: 12px;
+  background-color: var(--gray-alpha-100);
+  border-radius: 8px;
+  border: 1px solid var(--gray-alpha-200);
+}
+
+.directionInput input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid var(--gray-alpha-200);
+  border-radius: 6px;
+  font-size: 14px;
+  background-color: var(--background);
+  color: var(--foreground);
+}
+
+.directionInput input:focus {
+  outline: none;
+  border-color: var(--primary-light);
+  box-shadow: 0 0 0 2px rgba(51, 154, 240, 0.2);
+}
+
+.directionSubmit,
+.directionCancel {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.directionSubmit {
+  background-color: var(--primary-light);
+  color: white;
+}
+
+.directionSubmit:hover:not(:disabled) {
+  background-color: var(--primary-dark);
+  transform: translateY(-1px);
+}
+
+.directionSubmit:disabled {
+  background-color: var(--secondary-light);
+  cursor: not-allowed;
+  transform: none;
+}
+
+.directionCancel {
+  background-color: var(--gray-alpha-200);
+  color: var(--foreground);
+}
+
+.directionCancel:hover {
+  background-color: var(--gray-alpha-100);
 }
 
 .disabled {
@@ -304,8 +406,8 @@ a.secondary {
 .disabled input,
 .disabled textarea,
 .disabled select {
-  background-color: #f5f5f5;
-  color: #666;
+  background-color: var(--disabled-bg);
+  color: var(--disabled-text);
 }
 
 .inputGroup label {
@@ -498,7 +600,7 @@ a.secondary {
 }
 
 .generateButton {
-  background: #007acc;
+  background: var(--primary);
   color: white;
   border: none;
   border-radius: 6px;
@@ -510,22 +612,22 @@ a.secondary {
 }
 
 .generateButton:hover:not(:disabled) {
-  background: #005a9e;
+  background: var(--primary-dark);
 }
 
 .generateButton:disabled {
-  background: #ccc;
+  background: var(--secondary-light);
   cursor: not-allowed;
 }
 
 .error {
-  color: #d32f2f;
+  color: var(--error);
   font-size: 14px;
   margin-top: 8px;
   padding: 8px 12px;
-  background: rgba(211, 47, 47, 0.1);
+  background: var(--error-bg);
   border-radius: 4px;
-  border: 1px solid rgba(211, 47, 47, 0.2);
+  border: 1px solid var(--error-border);
 }
 
 .checkboxGrid {
@@ -591,8 +693,79 @@ a.secondary {
   gap: 12px;
 }
 
+.floatingInstructions {
+  background: var(--background);
+  border: 1px solid var(--gray-alpha-200);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  min-width: 300px;
+  max-width: 400px;
+}
+
+.instructionsTextarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--gray-alpha-200);
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.4;
+  background: var(--background);
+  color: var(--foreground);
+  resize: vertical;
+  min-height: 80px;
+  font-family: inherit;
+}
+
+.instructionsTextarea:focus {
+  outline: none;
+  border-color: var(--foreground);
+}
+
+.instructionsButtons {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  justify-content: flex-end;
+}
+
+.closeInstructionsButton,
+.clearInstructionsButton {
+  background: var(--gray-alpha-100);
+  color: var(--foreground);
+  border: 1px solid var(--gray-alpha-200);
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.closeInstructionsButton:hover,
+.clearInstructionsButton:hover {
+  background: var(--gray-alpha-200);
+}
+
+.toggleInstructionsButton {
+  background: var(--gray-alpha-100);
+  color: var(--foreground);
+  border: 1px solid var(--gray-alpha-200);
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  white-space: nowrap;
+}
+
+.toggleInstructionsButton:hover {
+  background: var(--gray-alpha-200);
+}
+
 .floatingGenerateButton {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--gradient-primary);
   color: white;
   border: none;
   border-radius: 50px;
@@ -618,11 +791,11 @@ a.secondary {
 }
 
 .floatingGenerator .error {
-  background: rgba(231, 76, 60, 0.1);
-  color: #e74c3c;
+  background: var(--error-bg);
+  color: var(--error);
   padding: 12px 16px;
   border-radius: 8px;
-  border: 1px solid rgba(231, 76, 60, 0.2);
+  border: 1px solid var(--error-border);
   font-size: 14px;
   max-width: 300px;
   text-align: center;
@@ -633,6 +806,15 @@ a.secondary {
     bottom: 20px;
     right: 20px;
     left: 20px;
+  }
+
+  .floatingInstructions {
+    min-width: auto;
+    max-width: none;
+  }
+
+  .toggleInstructionsButton {
+    align-self: stretch;
   }
 
   .floatingGenerateButton {

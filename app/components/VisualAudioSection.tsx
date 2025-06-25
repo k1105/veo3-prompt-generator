@@ -13,6 +13,8 @@ type VisualAudioSectionProps = {
   onAuralChange: (field: keyof VisualAudio["aural"], value: string) => void;
   lockState?: LockState["visual_audio"];
   onLockToggle?: (section: "visual" | "aural", field: string) => void;
+  onVisualUpdate?: (field: string, direction?: string) => Promise<void>;
+  onAuralUpdate?: (field: string, direction?: string) => Promise<void>;
 };
 
 export default function VisualAudioSection({
@@ -21,6 +23,8 @@ export default function VisualAudioSection({
   onAuralChange,
   lockState,
   onLockToggle,
+  onVisualUpdate,
+  onAuralUpdate,
 }: VisualAudioSectionProps) {
   return (
     <section className={styles.formSection}>
@@ -38,6 +42,8 @@ export default function VisualAudioSection({
           onLockToggle={
             onLockToggle ? () => onLockToggle("visual", "tone") : undefined
           }
+          onUpdate={onVisualUpdate}
+          fieldKey="visual.tone"
         />
         <FormField
           id="palette"
@@ -49,6 +55,8 @@ export default function VisualAudioSection({
           onLockToggle={
             onLockToggle ? () => onLockToggle("visual", "palette") : undefined
           }
+          onUpdate={onVisualUpdate}
+          fieldKey="visual.palette"
         />
         <FormField
           id="keyFX"
@@ -60,6 +68,8 @@ export default function VisualAudioSection({
           onLockToggle={
             onLockToggle ? () => onLockToggle("visual", "keyFX") : undefined
           }
+          onUpdate={onVisualUpdate}
+          fieldKey="visual.keyFX"
         />
         <FormField
           id="camera"
@@ -71,6 +81,8 @@ export default function VisualAudioSection({
           onLockToggle={
             onLockToggle ? () => onLockToggle("visual", "camera") : undefined
           }
+          onUpdate={onVisualUpdate}
+          fieldKey="visual.camera"
         />
         <FormField
           id="lighting"
@@ -82,6 +94,8 @@ export default function VisualAudioSection({
           onLockToggle={
             onLockToggle ? () => onLockToggle("visual", "lighting") : undefined
           }
+          onUpdate={onVisualUpdate}
+          fieldKey="visual.lighting"
         />
       </div>
       <div className={styles.subSection}>
@@ -96,6 +110,8 @@ export default function VisualAudioSection({
           onLockToggle={
             onLockToggle ? () => onLockToggle("aural", "bgm") : undefined
           }
+          onUpdate={onAuralUpdate}
+          fieldKey="aural.bgm"
         />
         <FormField
           id="sfx"
@@ -109,6 +125,8 @@ export default function VisualAudioSection({
           onLockToggle={
             onLockToggle ? () => onLockToggle("aural", "sfx") : undefined
           }
+          onUpdate={onAuralUpdate}
+          fieldKey="aural.sfx"
         />
         <FormField
           id="ambience"
@@ -120,6 +138,8 @@ export default function VisualAudioSection({
           onLockToggle={
             onLockToggle ? () => onLockToggle("aural", "ambience") : undefined
           }
+          onUpdate={onAuralUpdate}
+          fieldKey="aural.ambience"
         />
       </div>
     </section>

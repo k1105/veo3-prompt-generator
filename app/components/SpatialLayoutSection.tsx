@@ -9,6 +9,7 @@ type SpatialLayoutSectionProps = {
   onChange: (field: keyof SpatialLayout, value: string) => void;
   lockState?: LockState["spatial_layout"];
   onLockToggle?: (field: string) => void;
+  onUpdate?: (field: string, direction?: string) => Promise<void>;
 };
 
 export default function SpatialLayoutSection({
@@ -16,6 +17,7 @@ export default function SpatialLayoutSection({
   onChange,
   lockState,
   onLockToggle,
+  onUpdate,
 }: SpatialLayoutSectionProps) {
   return (
     <section className={styles.formSection}>
@@ -30,6 +32,8 @@ export default function SpatialLayoutSection({
         rows={3}
         locked={lockState?.main}
         onLockToggle={onLockToggle ? () => onLockToggle("main") : undefined}
+        onUpdate={onUpdate}
+        fieldKey="spatial_layout.main"
       />
       <FormField
         id="foreground"
@@ -43,6 +47,8 @@ export default function SpatialLayoutSection({
         onLockToggle={
           onLockToggle ? () => onLockToggle("foreground") : undefined
         }
+        onUpdate={onUpdate}
+        fieldKey="spatial_layout.foreground"
       />
       <FormField
         id="midground"
@@ -56,6 +62,8 @@ export default function SpatialLayoutSection({
         onLockToggle={
           onLockToggle ? () => onLockToggle("midground") : undefined
         }
+        onUpdate={onUpdate}
+        fieldKey="spatial_layout.midground"
       />
       <FormField
         id="background"
@@ -69,6 +77,8 @@ export default function SpatialLayoutSection({
         onLockToggle={
           onLockToggle ? () => onLockToggle("background") : undefined
         }
+        onUpdate={onUpdate}
+        fieldKey="spatial_layout.background"
       />
     </section>
   );

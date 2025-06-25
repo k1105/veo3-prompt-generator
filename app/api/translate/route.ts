@@ -2,7 +2,7 @@ import {NextRequest, NextResponse} from "next/server";
 
 export async function POST(request: NextRequest) {
   try {
-    const {content, type} = await request.json();
+    const {content, type, customApiKey} = await request.json();
 
     if (!content) {
       return NextResponse.json(
@@ -11,11 +11,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Gemini API キーを環境変数から取得
-    const apiKey = process.env.GEMINI_API_KEY;
+    // カスタムAPIキーまたは環境変数からAPIキーを取得
+    const apiKey = customApiKey || process.env.GEMINI_API_KEY;
     if (!apiKey) {
       return NextResponse.json(
-        {error: "Gemini API キーが設定されていません"},
+        {error: "API キーが設定されていません"},
         {status: 500}
       );
     }

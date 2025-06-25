@@ -4,7 +4,9 @@ import styles from "../page.module.css";
 import Timeline from "./Timeline";
 import TimeInput from "./TimeInput";
 import FormField from "./FormField";
-import {TimeSegment} from "../types";
+import LockButton from "./LockButton";
+import PreviewButton from "./PreviewButton";
+import {TimeSegment, VisualAudio, SpatialLayout} from "../types";
 
 type TimeAxisSectionProps = {
   totalDuration: number;
@@ -17,6 +19,12 @@ type TimeAxisSectionProps = {
   onTimeDecrement: (field: "startTime" | "endTime") => void;
   locked?: boolean;
   onLockToggle?: () => void;
+  onSegmentActionUpdate?: (direction?: string) => Promise<void>;
+  visualAudio: VisualAudio;
+  spatialLayout: SpatialLayout;
+  title: string;
+  synopsis: string;
+  apiKey: string;
 };
 
 export default function TimeAxisSection({
@@ -30,6 +38,12 @@ export default function TimeAxisSection({
   onTimeDecrement,
   locked = false,
   onLockToggle,
+  onSegmentActionUpdate,
+  visualAudio,
+  spatialLayout,
+  title,
+  synopsis,
+  apiKey,
 }: TimeAxisSectionProps) {
   const formatTimeForInput = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -42,18 +56,7 @@ export default function TimeAxisSection({
     <section className={styles.formSection}>
       <div className={styles.fieldHeader}>
         <h2>Time Axis</h2>
-        {onLockToggle && (
-          <button
-            type="button"
-            onClick={onLockToggle}
-            className={`${styles.lockButton} ${
-              locked ? styles.locked : styles.unlocked
-            }`}
-            title={locked ? "アンロック" : "ロック"}
-          >
-            {locked ? "🔒" : "🔓"}
-          </button>
-        )}
+        {onLockToggle && <LockButton locked={locked} onToggle={onLockToggle} />}
       </div>
       <Timeline
         totalDuration={totalDuration}
@@ -127,6 +130,16 @@ export default function TimeAxisSection({
             type="textarea"
             rows={3}
             locked={locked}
+            onUpdate={onSegmentActionUpdate}
+            fieldKey="segmentAction"
+          />
+          <PreviewButton
+            segment={selectedSegment}
+            visualAudio={visualAudio}
+            spatialLayout={spatialLayout}
+            title={title}
+            synopsis={synopsis}
+            apiKey={apiKey}
           />
         </div>
       )}

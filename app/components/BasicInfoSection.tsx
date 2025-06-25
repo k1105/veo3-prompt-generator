@@ -12,6 +12,8 @@ type BasicInfoSectionProps = {
   synopsisLocked?: boolean;
   onTitleLockToggle?: () => void;
   onSynopsisLockToggle?: () => void;
+  onTitleUpdate?: (direction?: string) => Promise<void>;
+  onSynopsisUpdate?: (direction?: string) => Promise<void>;
 };
 
 export default function BasicInfoSection({
@@ -23,6 +25,8 @@ export default function BasicInfoSection({
   synopsisLocked = false,
   onTitleLockToggle,
   onSynopsisLockToggle,
+  onTitleUpdate,
+  onSynopsisUpdate,
 }: BasicInfoSectionProps) {
   return (
     <section className={styles.formSection}>
@@ -35,6 +39,8 @@ export default function BasicInfoSection({
         placeholder="Enter scene title"
         locked={titleLocked}
         onLockToggle={onTitleLockToggle}
+        onUpdate={onTitleUpdate}
+        fieldKey="title"
       />
       <FormField
         id="synopsis"
@@ -46,6 +52,8 @@ export default function BasicInfoSection({
         rows={4}
         locked={synopsisLocked}
         onLockToggle={onSynopsisLockToggle}
+        onUpdate={onSynopsisUpdate}
+        fieldKey="synopsis"
       />
     </section>
   );

@@ -97,13 +97,29 @@
   transform: translateY(-2px);
 }
 
+.segmentContent {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  padding: 0 8px;
+  text-align: center;
+  color: var(--background);
+  font-size: 0.8rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: none;
+}
+
 .removeButton {
   position: absolute;
   top: 4px;
   right: 4px;
   width: 20px;
   height: 20px;
-  background: rgba(255, 0, 0, 0.8);
+  background: var(--error);
   color: white;
   border: none;
   border-radius: 50%;
@@ -120,7 +136,7 @@
 }
 
 .removeButton:hover {
-  background: rgba(255, 0, 0, 1);
+  background: var(--error-hover);
 }
 
 .cutPoint {
@@ -156,22 +172,6 @@
   width: 6px;
   background: var(--button-primary-hover);
   box-shadow: 0 0 6px rgba(0, 0, 0, 0.5);
-}
-
-.segmentContent {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 100%;
-  padding: 0 8px;
-  text-align: center;
-  color: var(--background);
-  font-size: 0.8rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  pointer-events: none;
 }
 
 .segmentTime {

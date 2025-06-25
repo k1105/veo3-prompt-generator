@@ -9,6 +9,7 @@ import SpatialLayoutSection from "./components/SpatialLayoutSection";
 import TimeAxisSection from "./components/TimeAxisSection";
 import YamlOutputSection from "./components/YamlOutputSection";
 import FloatingGenerator from "./components/FloatingGenerator";
+import ApiKeyManager from "./components/ApiKeyManager";
 import {generateYaml} from "./utils/yamlGenerator";
 
 export default function Home() {
@@ -99,6 +100,7 @@ export default function Home() {
   const [showYaml, setShowYaml] = useState<boolean>(false);
   const [copySuccess, setCopySuccess] = useState<boolean>(false);
   const [isGeneratingYaml, setIsGeneratingYaml] = useState<boolean>(false);
+  const [apiKey, setApiKey] = useState<string>("");
 
   const handleInputChange = (
     section: keyof FormData,
@@ -389,10 +391,109 @@ export default function Home() {
     });
   };
 
+  // フィールドアップデート機能
+  const handleFieldUpdate = async (field: string, direction?: string) => {
+    try {
+      // フィールドの現在の値を取得
+      let currentValue: string = "";
+
+      if (field === "title") {
+        currentValue = formData.title;
+      } else if (field === "synopsis") {
+        currentValue = formData.synopsis;
+      } else if (field.startsWith("visual.")) {
+        const visualField = field.split(
+          "."
+        )[1] as keyof FormData["visual_audio"]["visual"];
+        currentValue = formData.visual_audio.visual[visualField] as string;
+      } else if (field.startsWith("aural.")) {
+        const auralField = field.split(
+          "."
+        )[1] as keyof FormData["visual_audio"]["aural"];
+        currentValue = formData.visual_audio.aural[auralField];
+      } else if (field.startsWith("spatial_layout.")) {
+        const spatialField = field.split(
+          "."
+        )[1] as keyof FormData["spatial_layout"];
+        currentValue = formData.spatial_layout[spatialField];
+      } else if (field === "segmentAction" && selectedSegment) {
+        currentValue = selectedSegment.action;
+      }
+
+      const requestBody: {
+        field: string;
+        currentValue: string;
+        direction?: string;
+        context: string;
+        customApiKey?: string;
+      } = {
+        field,
+        currentValue,
+        direction,
+        context: `Title: ${formData.title}, Synopsis: ${formData.synopsis}`,
+      };
+
+      // カスタムAPIキーが設定されている場合は追加
+      if (apiKey) {
+        requestBody.customApiKey = apiKey;
+      }
+
+      const response = await fetch("/api/update-field", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      if (!response.ok) {
+        throw new Error("フィールドの更新に失敗しました");
+      }
+
+      const data = await response.json();
+
+      // 更新された値をフォームに反映
+      if (field === "title") {
+        handleInputChange("title", "title", data.updatedValue);
+      } else if (field === "synopsis") {
+        handleInputChange("synopsis", "synopsis", data.updatedValue);
+      } else if (field.startsWith("visual.")) {
+        const visualField = field.split(
+          "."
+        )[1] as keyof FormData["visual_audio"]["visual"];
+        handleNestedInputChange(
+          "visual_audio",
+          "visual",
+          visualField,
+          data.updatedValue
+        );
+      } else if (field.startsWith("aural.")) {
+        const auralField = field.split(
+          "."
+        )[1] as keyof FormData["visual_audio"]["aural"];
+        handleNestedInputChange(
+          "visual_audio",
+          "aural",
+          auralField,
+          data.updatedValue
+        );
+      } else if (field.startsWith("spatial_layout.")) {
+        const spatialField = field.split(
+          "."
+        )[1] as keyof FormData["spatial_layout"];
+        handleInputChange("spatial_layout", spatialField, data.updatedValue);
+      } else if (field === "segmentAction" && selectedSegment) {
+        handleSegmentActionChange(data.updatedValue);
+      }
+    } catch (error) {
+      console.error("Field update error:", error);
+      alert("フィールドの更新に失敗しました");
+    }
+  };
+
   return (
     <div className={styles.page}>
       <main className={styles.main}>
-        <h1>YAML Scene Generator</h1>
         <form onSubmit={handleSubmit} className={styles.form}>
           <BasicInfoSection
             title={formData.title}
@@ -409,6 +510,10 @@ export default function Home() {
             onSynopsisLockToggle={() =>
               handleLockToggle("synopsis", "synopsis")
             }
+            onTitleUpdate={(direction) => handleFieldUpdate("title", direction)}
+            onSynopsisUpdate={(direction) =>
+              handleFieldUpdate("synopsis", direction)
+            }
           />
 
           <VisualAudioSection
@@ -423,6 +528,12 @@ export default function Home() {
             onLockToggle={(subsection, field) =>
               handleLockToggle("visual_audio", field, subsection)
             }
+            onVisualUpdate={(field, direction) =>
+              handleFieldUpdate(`visual.${field}`, direction)
+            }
+            onAuralUpdate={(field, direction) =>
+              handleFieldUpdate(`aural.${field}`, direction)
+            }
           />
 
           <SpatialLayoutSection
@@ -432,6 +543,9 @@ export default function Home() {
             }
             lockState={lockState.spatial_layout}
             onLockToggle={(field) => handleLockToggle("spatial_layout", field)}
+            onUpdate={(field, direction) =>
+              handleFieldUpdate(`spatial_layout.${field}`, direction)
+            }
           />
 
           <TimeAxisSection
@@ -445,6 +559,14 @@ export default function Home() {
             onTimeDecrement={handleTimeDecrement}
             locked={lockState.time_axis}
             onLockToggle={() => handleLockToggle("time_axis", "time_axis")}
+            onSegmentActionUpdate={(direction) =>
+              handleFieldUpdate("segmentAction", direction)
+            }
+            visualAudio={formData.visual_audio}
+            spatialLayout={formData.spatial_layout}
+            title={formData.title}
+            synopsis={formData.synopsis}
+            apiKey={apiKey}
           />
 
           <button
@@ -468,6 +590,12 @@ export default function Home() {
         formData={formData}
         lockState={lockState}
         onGenerate={handleGeneratedData}
+        apiKey={apiKey}
+      />
+
+      <ApiKeyManager
+        onApiKeySet={(value: string) => setApiKey(value)}
+        currentApiKey={apiKey}
       />
     </div>
   );

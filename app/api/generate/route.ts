@@ -83,17 +83,17 @@ function cleanAndParseJSON(jsonText: string) {
 
 export async function POST(request: NextRequest) {
   try {
-    const {prompt} = await request.json();
+    const {prompt, customApiKey} = await request.json();
 
     if (!prompt) {
       return NextResponse.json({error: "プロンプトが必要です"}, {status: 400});
     }
 
-    // Gemini API キーを環境変数から取得
-    const apiKey = process.env.GEMINI_API_KEY;
+    // カスタムAPIキーまたは環境変数からAPIキーを取得
+    const apiKey = customApiKey || process.env.GEMINI_API_KEY;
     if (!apiKey) {
       return NextResponse.json(
-        {error: "Gemini API キーが設定されていません"},
+        {error: "API キーが設定されていません"},
         {status: 500}
       );
     }

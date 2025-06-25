@@ -1,7 +1,11 @@
 "use client";
 
+import {useState} from "react";
 import styles from "../page.module.css";
 import {ToneOption} from "../types";
+import LockButton from "./LockButton";
+import UpdateButton from "./UpdateButton";
+import DirectionInput from "./DirectionInput";
 
 type FormFieldProps = {
   id: string;
@@ -14,6 +18,8 @@ type FormFieldProps = {
   options?: ToneOption[];
   locked?: boolean;
   onLockToggle?: () => void;
+  onUpdate?: (field: string, direction?: string) => Promise<void>;
+  fieldKey?: string;
 };
 
 export default function FormField({
@@ -27,7 +33,38 @@ export default function FormField({
   options = [],
   locked = false,
   onLockToggle,
+  onUpdate,
+  fieldKey,
 }: FormFieldProps) {
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [showDirectionInput, setShowDirectionInput] = useState(false);
+
+  const handleUpdate = async (direction: string) => {
+    if (!onUpdate || !fieldKey) return;
+
+    setIsUpdating(true);
+    try {
+      await onUpdate(fieldKey, direction);
+      setShowDirectionInput(false);
+    } catch (error) {
+      console.error("Update failed:", error);
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handleUpdateClick = () => {
+    if (showDirectionInput) {
+      handleUpdate("");
+    } else {
+      setShowDirectionInput(true);
+    }
+  };
+
+  const handleCancelDirection = () => {
+    setShowDirectionInput(false);
+  };
+
   if (type === "checkbox") {
     const selectedValues = Array.isArray(value) ? value : [];
 
@@ -44,19 +81,25 @@ export default function FormField({
       <div className={styles.inputGroup}>
         <div className={styles.fieldHeader}>
           <label>{label}:</label>
-          {onLockToggle && (
-            <button
-              type="button"
-              onClick={onLockToggle}
-              className={`${styles.lockButton} ${
-                locked ? styles.locked : styles.unlocked
-              }`}
-              title={locked ? "アンロック" : "ロック"}
-            >
-              {locked ? "🔒" : "🔓"}
-            </button>
-          )}
+          <div className={styles.fieldButtons}>
+            {onLockToggle && (
+              <LockButton locked={locked} onToggle={onLockToggle} />
+            )}
+            {onUpdate && (
+              <UpdateButton
+                isUpdating={isUpdating}
+                onClick={handleUpdateClick}
+              />
+            )}
+          </div>
         </div>
+        {showDirectionInput && onUpdate && (
+          <DirectionInput
+            onSubmit={handleUpdate}
+            onCancel={handleCancelDirection}
+            isUpdating={isUpdating}
+          />
+        )}
         <div
           className={`${styles.checkboxGrid} ${locked ? styles.disabled : ""}`}
         >
@@ -88,19 +131,25 @@ export default function FormField({
       <div className={styles.inputGroup}>
         <div className={styles.fieldHeader}>
           <label htmlFor={id}>{label}:</label>
-          {onLockToggle && (
-            <button
-              type="button"
-              onClick={onLockToggle}
-              className={`${styles.lockButton} ${
-                locked ? styles.locked : styles.unlocked
-              }`}
-              title={locked ? "アンロック" : "ロック"}
-            >
-              {locked ? "🔒" : "🔓"}
-            </button>
-          )}
+          <div className={styles.fieldButtons}>
+            {onLockToggle && (
+              <LockButton locked={locked} onToggle={onLockToggle} />
+            )}
+            {onUpdate && (
+              <UpdateButton
+                isUpdating={isUpdating}
+                onClick={handleUpdateClick}
+              />
+            )}
+          </div>
         </div>
+        {showDirectionInput && onUpdate && (
+          <DirectionInput
+            onSubmit={handleUpdate}
+            onCancel={handleCancelDirection}
+            isUpdating={isUpdating}
+          />
+        )}
         <select
           id={id}
           value={value as string}
@@ -123,19 +172,22 @@ export default function FormField({
     <div className={styles.inputGroup}>
       <div className={styles.fieldHeader}>
         <label htmlFor={id}>{label}:</label>
-        {onLockToggle && (
-          <button
-            type="button"
-            onClick={onLockToggle}
-            className={`${styles.lockButton} ${
-              locked ? styles.locked : styles.unlocked
-            }`}
-            title={locked ? "アンロック" : "ロック"}
-          >
-            {locked ? "🔒" : "🔓"}
-          </button>
-        )}
+        <div className={styles.fieldButtons}>
+          {onLockToggle && (
+            <LockButton locked={locked} onToggle={onLockToggle} />
+          )}
+          {onUpdate && (
+            <UpdateButton isUpdating={isUpdating} onClick={handleUpdateClick} />
+          )}
+        </div>
       </div>
+      {showDirectionInput && onUpdate && (
+        <DirectionInput
+          onSubmit={handleUpdate}
+          onCancel={handleCancelDirection}
+          isUpdating={isUpdating}
+        />
+      )}
       {type === "textarea" ? (
         <textarea
           id={id}
