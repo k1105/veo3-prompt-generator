@@ -451,21 +451,27 @@ a.secondary {
 }
 
 .submitButton {
-  background: var(--foreground);
-  color: var(--background);
+  background: var(--gradient-primary);
+  color: white;
   border: none;
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 500;
+  border-radius: 12px;
+  padding: 16px 32px;
+  font-size: 16px;
+  font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s;
-  align-self: center;
-  min-width: 200px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
 }
 
-.submitButton:hover {
-  background: var(--button-primary-hover);
+.submitButton:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+}
+
+.submitButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .segmentEditor {
@@ -823,4 +829,159 @@ a.secondary {
     padding: 14px 24px;
     font-size: 14px;
   }
+}
+
+.outputSection {
+  background: var(--gray-alpha-100);
+  border-radius: 12px;
+  padding: 24px;
+  margin-top: 24px;
+  border: 1px solid var(--gray-alpha-200);
+}
+
+.outputHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.outputHeader h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+.outputContent {
+  background: var(--gray-alpha-100);
+  padding: 20px;
+  border-radius: 8px;
+  font-family: "Courier New", monospace;
+  font-size: 14px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  max-height: 400px;
+  overflow-y: auto;
+  border: 1px solid var(--gray-alpha-200);
+}
+
+.outputFormatSelector {
+  background: var(--gray-alpha-100);
+  border-radius: 12px;
+  padding: 20px;
+  margin: 24px 0;
+  border: 1px solid var(--gray-alpha-200);
+}
+
+.formatSection {
+  margin-bottom: 20px;
+}
+
+.formatSection:last-child {
+  margin-bottom: 0;
+}
+
+.formatSection h3 {
+  margin: 0 0 12px 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+.formatOptions {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.formatOption {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 6px;
+  transition: background-color 0.2s;
+}
+
+.formatOption:hover {
+  background: var(--gray-alpha-200);
+}
+
+.formatOption input[type="radio"] {
+  margin: 0;
+  cursor: pointer;
+}
+
+.formatOption span {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--foreground);
+}
+
+.promptSection {
+  margin-bottom: 24px;
+}
+
+.promptSection:last-child {
+  margin-bottom: 0;
+}
+
+.promptSection h3 {
+  margin: 0 0 12px 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--primary-light);
+  border-bottom: 2px solid var(--primary-light);
+  padding-bottom: 4px;
+}
+
+.promptSection pre {
+  margin: 0;
+  background: var(--background);
+  padding: 16px;
+  border-radius: 6px;
+  border: 1px solid var(--gray-alpha-200);
+  font-family: "Courier New", monospace;
+  font-size: 14px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.generateSection {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin: 24px 0;
+}
+
+.generateSection .outputFormatSelector {
+  margin: 0;
+  padding: 12px 16px;
+  background: var(--gray-alpha-50);
+  border: 1px solid var(--gray-alpha-200);
+}
+
+.generateSection .formatSection {
+  margin-bottom: 0;
+}
+
+.generateSection .formatSection h3 {
+  font-size: 0.9rem;
+  margin-bottom: 8px;
+}
+
+.generateSection .formatOptions {
+  gap: 12px;
+}
+
+.generateSection .formatOption {
+  padding: 6px 10px;
+}
+
+.generateSection .formatOption span {
+  font-size: 0.8rem;
 }

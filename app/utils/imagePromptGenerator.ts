@@ -44,14 +44,20 @@ export function generateImagePrompt(
   if (visual.keyFX) {
     prompt += `Special effects: ${visual.keyFX}. `;
   }
-  if (visual.camera) {
-    prompt += `Camera angle: ${visual.camera}. `;
+  if (segment.camera) {
+    prompt += `Camera angle: ${segment.camera}. `;
   }
   if (visual.lighting) {
     prompt += `Lighting: ${visual.lighting}. `;
   }
 
   prompt += `High quality, cinematic photography, professional film still, dramatic lighting, detailed composition.`;
+
+  // 安全上のガイドラインを追加
+  prompt += ` Safe for all audiences, family-friendly content, no violence, no inappropriate content.`;
+
+  // 安全なコンテンツの推奨事項を追加
+  prompt += ` Focus on landscapes, nature, objects, and general scenes. Avoid depictions of people in potentially unsafe situations.`;
 
   return prompt;
 }

@@ -77,7 +77,15 @@ export default function PreviewButton({
       const data = await response.json();
 
       if (data.error) {
-        throw new Error(data.error);
+        // 安全上の理由でブロックされた場合の特別な処理
+        if (data.finishReason === "SAFETY") {
+          setError(
+            `Safety Block: ${data.error}. Please try a different prompt that avoids potentially unsafe content.`
+          );
+        } else {
+          throw new Error(data.error);
+        }
+        return;
       }
 
       if (data.imageData) {
@@ -125,6 +133,11 @@ export default function PreviewButton({
             Clear
           </button>
         )}
+      </div>
+
+      <div className="preview-help">
+        💡 Tip: If image generation is blocked, try avoiding potentially unsafe
+        content like weapons, violence, or inappropriate themes.
       </div>
 
       {error && <div className="preview-error">{error}</div>}
@@ -231,6 +244,14 @@ export default function PreviewButton({
         .clear-button:disabled {
           background: #6c757d;
           cursor: not-allowed;
+        }
+
+        .preview-help {
+          font-size: 12px;
+          color: #6c757d;
+          margin-top: 4px;
+          line-height: 1.3;
+          font-style: italic;
         }
       `}</style>
     </div>

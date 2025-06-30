@@ -4,7 +4,7 @@ const formatTimeAxis = (segments: TimeSegment[]) => {
   return segments
     .map(
       (segment) =>
-        `- t: ${segment.startTime}–${segment.endTime} s\naction: ${segment.action}`
+        `- t: ${segment.startTime}–${segment.endTime} s\naction: ${segment.action}\ncamera: ${segment.camera}`
     )
     .join("\n");
 };
@@ -20,7 +20,6 @@ export const generateYaml = async (data: FormData): Promise<string> => {
         : data.visual_audio.visual.tone || "",
       palette: data.visual_audio.visual.palette || "",
       keyFX: data.visual_audio.visual.keyFX || "",
-      camera: data.visual_audio.visual.camera || "",
       lighting: data.visual_audio.visual.lighting || "",
     },
     aural: {
@@ -36,6 +35,7 @@ export const generateYaml = async (data: FormData): Promise<string> => {
     },
     time_axis: data.time_axis.map((segment) => ({
       action: segment.action,
+      camera: segment.camera,
     })),
   };
 
@@ -49,7 +49,6 @@ export const generateYaml = async (data: FormData): Promise<string> => {
       tone?: string;
       palette?: string;
       keyFX?: string;
-      camera?: string;
       lighting?: string;
     };
     aural?: {
@@ -63,7 +62,7 @@ export const generateYaml = async (data: FormData): Promise<string> => {
       midground?: string;
       background?: string;
     };
-    time_axis?: Array<{action?: string}>;
+    time_axis?: Array<{action?: string; camera?: string}>;
   }> => {
     try {
       const controller = new AbortController();
@@ -133,9 +132,6 @@ tone: ${
       translatedData.visual?.palette || data.visual_audio.visual.palette || ""
     }
 key FX: ${translatedData.visual?.keyFX || data.visual_audio.visual.keyFX || ""}
-camera: ${
-      translatedData.visual?.camera || data.visual_audio.visual.camera || ""
-    }
 lighting: ${
       translatedData.visual?.lighting || data.visual_audio.visual.lighting || ""
     }
@@ -162,7 +158,7 @@ ${data.time_axis
     (segment, index) =>
       `- t: ${segment.startTime}–${segment.endTime} s\naction: ${
         translatedData.time_axis?.[index]?.action || segment.action
-      }`
+      }\ncamera: ${translatedData.time_axis?.[index]?.camera || segment.camera}`
   )
   .join("\n")}`;
 
@@ -184,7 +180,6 @@ tone: ${
         : data.visual_audio.visual.tone || ""
     }; palette: ${data.visual_audio.visual.palette || ""}
 key FX: ${data.visual_audio.visual.keyFX || ""}
-camera: ${data.visual_audio.visual.camera || ""}
 lighting: ${data.visual_audio.visual.lighting || ""}
 Aural —
 BGM: ${data.visual_audio.aural.bgm || ""}

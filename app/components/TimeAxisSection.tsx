@@ -15,11 +15,13 @@ type TimeAxisSectionProps = {
   onSegmentChange: (segments: TimeSegment[]) => void;
   onSegmentSelect: (segment: TimeSegment | null) => void;
   onSegmentActionChange: (action: string) => void;
+  onSegmentCameraChange: (camera: string) => void;
   onTimeIncrement: (field: "startTime" | "endTime") => void;
   onTimeDecrement: (field: "startTime" | "endTime") => void;
   locked?: boolean;
   onLockToggle?: () => void;
   onSegmentActionUpdate?: (direction?: string) => Promise<void>;
+  onSegmentCameraUpdate?: (direction?: string) => Promise<void>;
   visualAudio: VisualAudio;
   spatialLayout: SpatialLayout;
   title: string;
@@ -34,11 +36,13 @@ export default function TimeAxisSection({
   onSegmentChange,
   onSegmentSelect,
   onSegmentActionChange,
+  onSegmentCameraChange,
   onTimeIncrement,
   onTimeDecrement,
   locked = false,
   onLockToggle,
   onSegmentActionUpdate,
+  onSegmentCameraUpdate,
   visualAudio,
   spatialLayout,
   title,
@@ -132,6 +136,16 @@ export default function TimeAxisSection({
             locked={locked}
             onUpdate={onSegmentActionUpdate}
             fieldKey="segmentAction"
+          />
+          <FormField
+            id="segmentCamera"
+            label="Camera"
+            value={selectedSegment.camera}
+            onChange={(value) => onSegmentCameraChange(value as string)}
+            placeholder="e.g., slow push-in → whip-pan"
+            locked={locked}
+            onUpdate={onSegmentCameraUpdate}
+            fieldKey="segmentCamera"
           />
           <PreviewButton
             segment={selectedSegment}

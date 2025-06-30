@@ -155,6 +155,7 @@ export default function Timeline({
       startTime: roundToNearestTenth(clickTime),
       endTime: roundToNearestTenth(nextTime),
       action: "New scene",
+      camera: "steady shot",
     };
 
     // Update existing segment

@@ -72,19 +72,6 @@ export default function VisualAudioSection({
           fieldKey="visual.keyFX"
         />
         <FormField
-          id="camera"
-          label="Camera"
-          value={visualAudio.visual.camera}
-          onChange={(value) => onVisualChange("camera", value as string)}
-          placeholder="e.g., slow push-in → whip-pan"
-          locked={lockState?.visual.camera}
-          onLockToggle={
-            onLockToggle ? () => onLockToggle("visual", "camera") : undefined
-          }
-          onUpdate={onVisualUpdate}
-          fieldKey="visual.camera"
-        />
-        <FormField
           id="lighting"
           label="Lighting"
           value={visualAudio.visual.lighting}

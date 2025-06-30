@@ -3,6 +3,7 @@ export type TimeSegment = {
   startTime: number;
   endTime: number;
   action: string;
+  camera: string;
 };
 
 export type ToneOption = {
@@ -185,7 +186,6 @@ export type VisualAudio = {
     tone: string[];
     palette: string;
     keyFX: string;
-    camera: string;
     lighting: string;
   };
   aural: {
@@ -219,7 +219,6 @@ export type LockState = {
       tone: boolean;
       palette: boolean;
       keyFX: boolean;
-      camera: boolean;
       lighting: boolean;
     };
     aural: {
@@ -239,3 +238,5 @@ export type LockState = {
 
 export type VisualAudioSection = FormData["visual_audio"];
 export type VisualAudioSubsection = keyof VisualAudioSection;
+
+export type OutputFormat = "yaml" | "descriptive";

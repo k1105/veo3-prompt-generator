@@ -30,7 +30,6 @@ export default function FloatingGenerator({
       !lockState.visual_audio.visual.tone ||
       !lockState.visual_audio.visual.palette ||
       !lockState.visual_audio.visual.keyFX ||
-      !lockState.visual_audio.visual.camera ||
       !lockState.visual_audio.visual.lighting ||
       !lockState.visual_audio.aural.bgm ||
       !lockState.visual_audio.aural.sfx ||
@@ -66,9 +65,6 @@ export default function FloatingGenerator({
               : null,
             keyFX: lockState.visual_audio.visual.keyFX
               ? formData.visual_audio.visual.keyFX
-              : null,
-            camera: lockState.visual_audio.visual.camera
-              ? formData.visual_audio.visual.camera
               : null,
             lighting: lockState.visual_audio.visual.lighting
               ? formData.visual_audio.visual.lighting
@@ -136,9 +132,6 @@ export default function FloatingGenerator({
       "keyFX": "${
         lockedInfo.visual_audio.visual.keyFX || "生成された主要効果"
       }",
-      "camera": "${
-        lockedInfo.visual_audio.visual.camera || "生成されたカメラワーク"
-      }",
       "lighting": "${
         lockedInfo.visual_audio.visual.lighting || "生成された照明"
       }"
@@ -161,10 +154,10 @@ export default function FloatingGenerator({
     lockedInfo.time_axis
       ? JSON.stringify(lockedInfo.time_axis)
       : `[
-    {"id": "1", "startTime": 0.0, "endTime": 2.0, "action": "生成されたアクション1"},
-    {"id": "2", "startTime": 2.0, "endTime": 4.0, "action": "生成されたアクション2"},
-    {"id": "3", "startTime": 4.0, "endTime": 6.0, "action": "生成されたアクション3"},
-    {"id": "4", "startTime": 6.0, "endTime": 8.0, "action": "生成されたアクション4"}
+    {"id": "1", "startTime": 0.0, "endTime": 2.0, "action": "生成されたアクション1", "camera": "生成されたカメラワーク1"},
+    {"id": "2", "startTime": 2.0, "endTime": 4.0, "action": "生成されたアクション2", "camera": "生成されたカメラワーク2"},
+    {"id": "3", "startTime": 4.0, "endTime": 6.0, "action": "生成されたアクション3", "camera": "生成されたカメラワーク3"},
+    {"id": "4", "startTime": 6.0, "endTime": 8.0, "action": "生成されたアクション4", "camera": "生成されたカメラワーク4"}
   ]`
   }
 }

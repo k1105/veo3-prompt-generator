@@ -8,6 +8,13 @@ declare module "@google/generative-ai" {
   }
 }
 
+// Safety rating structure based on actual API response
+interface SafetyRatingExtended {
+  blocked?: boolean;
+  category?: string;
+  probability?: string;
+}
+
 export async function POST(request: NextRequest) {
   try {
     const {prompt, apiKey: customApiKey} = await request.json();
@@ -63,6 +70,28 @@ export async function POST(request: NextRequest) {
     console.log("Full response structure:", JSON.stringify(response, null, 2));
     console.log("Candidates:", response.candidates);
     console.log("Parts:", response.candidates?.[0]?.content?.parts);
+
+    // 安全上の理由でブロックされているかチェック
+    const candidate = response.candidates?.[0];
+    if (candidate?.finishReason === "SAFETY") {
+      const safetyRatings = candidate.safetyRatings || [];
+      const blockedReasons = safetyRatings
+        .filter((rating: SafetyRatingExtended) => rating.blocked === true)
+        .map(
+          (rating: SafetyRatingExtended) =>
+            rating.category || rating.probability
+        )
+        .join(", ");
+
+      return NextResponse.json(
+        {
+          error: `Image generation was blocked for safety reasons. Blocked categories: ${blockedReasons}. Please try modifying your prompt to avoid potentially unsafe content.`,
+          finishReason: "SAFETY",
+          safetyRatings: safetyRatings,
+        },
+        {status: 400}
+      );
+    }
 
     // まずテキストレスポンスを確認
     const textResponse = response.text();

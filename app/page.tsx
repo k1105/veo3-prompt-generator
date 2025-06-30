@@ -2,15 +2,17 @@
 
 import {useState} from "react";
 import styles from "./page.module.css";
-import {FormData, TimeSegment, LockState} from "./types";
+import {FormData, TimeSegment, LockState, OutputFormat} from "./types";
 import BasicInfoSection from "./components/BasicInfoSection";
 import VisualAudioSection from "./components/VisualAudioSection";
 import SpatialLayoutSection from "./components/SpatialLayoutSection";
 import TimeAxisSection from "./components/TimeAxisSection";
-import YamlOutputSection from "./components/YamlOutputSection";
+import OutputSection from "./components/YamlOutputSection";
+import OutputFormatSelector from "./components/OutputFormatSelector";
 import FloatingGenerator from "./components/FloatingGenerator";
 import ApiKeyManager from "./components/ApiKeyManager";
 import {generateYaml} from "./utils/yamlGenerator";
+import {generatePrompt} from "./utils/promptGenerator";
 
 export default function Home() {
   const [formData, setFormData] = useState<FormData>({
@@ -21,7 +23,6 @@ export default function Home() {
         tone: [],
         palette: "",
         keyFX: "",
-        camera: "",
         lighting: "",
       },
       aural: {
@@ -43,12 +44,14 @@ export default function Home() {
         endTime: 2.0,
         action:
           "camera pushes in; talisman scroll unfurls; faint sparks flicker",
+        camera: "slow push-in",
       },
       {
         id: "2",
         startTime: 2.0,
         endTime: 5.0,
         action: 'first katana slash; sparks sculpt "Y" and "A"; orbit quickens',
+        camera: "steady medium shot",
       },
       {
         id: "3",
@@ -56,6 +59,7 @@ export default function Home() {
         endTime: 7.0,
         action:
           'second slash forges "M" and "L"; letters align above blade tip',
+        camera: "close-up on blade",
       },
       {
         id: "4",
@@ -63,6 +67,7 @@ export default function Home() {
         endTime: 8.0,
         action:
           'glyphs fuse into blazing "YAML" sigil; bright flash → iris-out',
+        camera: "wide shot with iris-out",
       },
     ],
   });
@@ -75,7 +80,6 @@ export default function Home() {
         tone: false,
         palette: false,
         keyFX: false,
-        camera: false,
         lighting: false,
       },
       aural: {
@@ -96,10 +100,12 @@ export default function Home() {
   const [selectedSegment, setSelectedSegment] = useState<TimeSegment | null>(
     null
   );
-  const [generatedYaml, setGeneratedYaml] = useState<string>("");
-  const [showYaml, setShowYaml] = useState<boolean>(false);
+  const [outputFormat, setOutputFormat] = useState<OutputFormat>("yaml");
+  const [generatedContent, setGeneratedContent] = useState<string>("");
+  const [generatedJapanese, setGeneratedJapanese] = useState<string>("");
+  const [showOutput, setShowOutput] = useState<boolean>(false);
   const [copySuccess, setCopySuccess] = useState<boolean>(false);
-  const [isGeneratingYaml, setIsGeneratingYaml] = useState<boolean>(false);
+  const [isGenerating, setIsGenerating] = useState<boolean>(false);
   const [apiKey, setApiKey] = useState<string>("");
 
   const handleInputChange = (
@@ -157,6 +163,20 @@ export default function Home() {
 
     // Update the selectedSegment reference
     setSelectedSegment((prev) => (prev ? {...prev, action} : null));
+  };
+
+  const handleSegmentCameraChange = (camera: string) => {
+    if (!selectedSegment) return;
+
+    setFormData((prev) => ({
+      ...prev,
+      time_axis: prev.time_axis.map((segment) =>
+        segment.id === selectedSegment.id ? {...segment, camera} : segment
+      ),
+    }));
+
+    // Update the selectedSegment reference
+    setSelectedSegment((prev) => (prev ? {...prev, camera} : null));
   };
 
   const handleSegmentTimeChange = (
@@ -221,7 +241,7 @@ export default function Home() {
 
   const handleCopyYaml = async () => {
     try {
-      await navigator.clipboard.writeText(generatedYaml);
+      await navigator.clipboard.writeText(generatedContent);
       setCopySuccess(true);
       setTimeout(() => setCopySuccess(false), 2000);
     } catch (err) {
@@ -231,12 +251,23 @@ export default function Home() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsGeneratingYaml(true);
-    generateYaml(formData).then((yaml) => {
-      setGeneratedYaml(yaml);
-      setShowYaml(true);
-      setIsGeneratingYaml(false);
-    });
+    setIsGenerating(true);
+
+    if (outputFormat === "yaml") {
+      generateYaml(formData).then((yaml) => {
+        setGeneratedContent(yaml);
+        setGeneratedJapanese("");
+        setShowOutput(true);
+        setIsGenerating(false);
+      });
+    } else {
+      generatePrompt(formData, apiKey).then((result) => {
+        setGeneratedContent(result.prompt);
+        setGeneratedJapanese(result.japanese);
+        setShowOutput(true);
+        setIsGenerating(false);
+      });
+    }
   };
 
   // ロック状態を考慮した生成処理
@@ -282,12 +313,6 @@ export default function Home() {
           data.visual_audio.visual.keyFX
         ) {
           newData.visual_audio.visual.keyFX = data.visual_audio.visual.keyFX;
-        }
-        if (
-          !lockState.visual_audio.visual.camera &&
-          data.visual_audio.visual.camera
-        ) {
-          newData.visual_audio.visual.camera = data.visual_audio.visual.camera;
         }
         if (
           !lockState.visual_audio.visual.lighting &&
@@ -338,7 +363,12 @@ export default function Home() {
 
       // Time Axis
       if (data.time_axis && !lockState.time_axis) {
-        newData.time_axis = data.time_axis;
+        // 各セグメントにcameraプロパティがない場合はデフォルト値を追加
+        const processedTimeAxis = data.time_axis.map((segment, index) => ({
+          ...segment,
+          camera: segment.camera || `steady shot ${index + 1}`,
+        }));
+        newData.time_axis = processedTimeAxis;
       }
 
       return newData;
@@ -418,6 +448,8 @@ export default function Home() {
         currentValue = formData.spatial_layout[spatialField];
       } else if (field === "segmentAction" && selectedSegment) {
         currentValue = selectedSegment.action;
+      } else if (field === "segmentCamera" && selectedSegment) {
+        currentValue = selectedSegment.camera;
       }
 
       const requestBody: {
@@ -484,6 +516,8 @@ export default function Home() {
         handleInputChange("spatial_layout", spatialField, data.updatedValue);
       } else if (field === "segmentAction" && selectedSegment) {
         handleSegmentActionChange(data.updatedValue);
+      } else if (field === "segmentCamera" && selectedSegment) {
+        handleSegmentCameraChange(data.updatedValue);
       }
     } catch (error) {
       console.error("Field update error:", error);
@@ -555,12 +589,16 @@ export default function Home() {
             onSegmentChange={handleTimeAxisChange}
             onSegmentSelect={handleSegmentSelect}
             onSegmentActionChange={handleSegmentActionChange}
+            onSegmentCameraChange={handleSegmentCameraChange}
             onTimeIncrement={handleTimeIncrement}
             onTimeDecrement={handleTimeDecrement}
             locked={lockState.time_axis}
             onLockToggle={() => handleLockToggle("time_axis", "time_axis")}
             onSegmentActionUpdate={(direction) =>
               handleFieldUpdate("segmentAction", direction)
+            }
+            onSegmentCameraUpdate={(direction) =>
+              handleFieldUpdate("segmentCamera", direction)
             }
             visualAudio={formData.visual_audio}
             spatialLayout={formData.spatial_layout}
@@ -569,19 +607,28 @@ export default function Home() {
             apiKey={apiKey}
           />
 
-          <button
-            type="submit"
-            className={styles.submitButton}
-            disabled={isGeneratingYaml}
-          >
-            {isGeneratingYaml ? "Generating..." : "Generate YAML"}
-          </button>
+          <div className={styles.generateSection}>
+            <button
+              type="submit"
+              className={styles.submitButton}
+              disabled={isGenerating}
+            >
+              {isGenerating ? "Generating..." : "Generate Prompt"}
+            </button>
+
+            <OutputFormatSelector
+              outputFormat={outputFormat}
+              onOutputFormatChange={setOutputFormat}
+            />
+          </div>
         </form>
 
-        <YamlOutputSection
-          yaml={generatedYaml}
-          showYaml={showYaml}
+        <OutputSection
+          content={generatedContent}
+          japanese={generatedJapanese}
+          showOutput={showOutput}
           copySuccess={copySuccess}
+          outputFormat={outputFormat}
           onCopy={handleCopyYaml}
         />
       </main>

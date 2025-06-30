@@ -52,10 +52,46 @@ JSON形式で回答：
     "background": "英語背景"
   },
   "time_axis": [
-    {"action": "英語アクション1"},
-    {"action": "英語アクション2"},
-    {"action": "英語アクション3"},
-    {"action": "英語アクション4"}
+    {"action": "英語アクション1", "camera": "英語カメラ1"},
+    {"action": "英語アクション2", "camera": "英語カメラ2"},
+    {"action": "英語アクション3", "camera": "英語カメラ3"},
+    {"action": "英語アクション4", "camera": "英語カメラ4"}
+  ]
+}
+`;
+    } else if (type === "prompt") {
+      // プロンプト生成用の構造化翻訳
+      prompt = `
+日本語を英語に翻訳してください。映画制作の専門用語を使用してください。
+
+${content}
+
+JSON形式で回答：
+{
+  "title": "英語タイトル",
+  "synopsis": "英語シノプシス",
+  "visual": {
+    "tone": "英語トーン",
+    "palette": "英語パレット",
+    "keyFX": "英語キーFX",
+    "lighting": "英語照明"
+  },
+  "aural": {
+    "bgm": "英語BGM",
+    "sfx": "英語SFX",
+    "ambience": "英語環境音"
+  },
+  "spatial": {
+    "main": "英語メイン",
+    "foreground": "英語前景",
+    "midground": "英語中景",
+    "background": "英語背景"
+  },
+  "time_axis": [
+    {"action": "英語アクション1", "camera": "英語カメラ1"},
+    {"action": "英語アクション2", "camera": "英語カメラ2"},
+    {"action": "英語アクション3", "camera": "英語カメラ3"},
+    {"action": "英語アクション4", "camera": "英語カメラ4"}
   ]
 }
 `;
@@ -119,7 +155,7 @@ ${content}
 
     const translatedText = data.candidates[0].content.parts[0].text;
 
-    if (type === "yaml") {
+    if (type === "yaml" || type === "prompt") {
       // JSONを安全に抽出・解析
       try {
         // 1. まず、```json ... ``` ブロックを探す
