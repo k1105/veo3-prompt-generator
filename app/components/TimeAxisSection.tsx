@@ -6,7 +6,8 @@ import TimeInput from "./TimeInput";
 import FormField from "./FormField";
 import LockButton from "./LockButton";
 import PreviewButton from "./PreviewButton";
-import {TimeSegment, VisualAudio, SpatialLayout} from "../types";
+import ReferenceButton from "./ReferenceButton";
+import {TimeSegment, VisualAudio, SpatialLayout, Scene} from "../types";
 
 type TimeAxisSectionProps = {
   totalDuration: number;
@@ -27,6 +28,11 @@ type TimeAxisSectionProps = {
   title: string;
   synopsis: string;
   apiKey: string;
+  scenes: Scene[];
+  activeSceneId: string;
+  onReference: (sourceSceneId: string, fieldPath: string) => void;
+  getReferenceInfo: (fieldPath: string) => any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  isFieldReferenced: (fieldPath: string) => boolean;
 };
 
 export default function TimeAxisSection({
@@ -48,6 +54,11 @@ export default function TimeAxisSection({
   title,
   synopsis,
   apiKey,
+  scenes,
+  activeSceneId,
+  onReference,
+  getReferenceInfo,
+  isFieldReferenced,
 }: TimeAxisSectionProps) {
   const formatTimeForInput = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -60,7 +71,19 @@ export default function TimeAxisSection({
     <section className={styles.formSection}>
       <div className={styles.fieldHeader}>
         <h2>Time Axis</h2>
-        {onLockToggle && <LockButton locked={locked} onToggle={onLockToggle} />}
+        <div className={styles.headerButtons}>
+          <ReferenceButton
+            currentSceneId={activeSceneId}
+            scenes={scenes}
+            fieldPath="time_axis"
+            onReference={onReference}
+            isReferenced={isFieldReferenced("time_axis")}
+            referenceInfo={getReferenceInfo("time_axis")}
+          />
+          {onLockToggle && (
+            <LockButton locked={locked} onToggle={onLockToggle} />
+          )}
+        </div>
       </div>
       <Timeline
         totalDuration={totalDuration}

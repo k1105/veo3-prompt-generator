@@ -240,3 +240,30 @@ export type VisualAudioSection = FormData["visual_audio"];
 export type VisualAudioSubsection = keyof VisualAudioSection;
 
 export type OutputFormat = "yaml" | "descriptive";
+
+export type ReferenceInfo = {
+  sourceSceneId: string;
+  sourceSceneName: string;
+  referencedAt: string; // ISO string
+  fieldPath: string; // e.g., "visual_audio.visual.tone"
+};
+
+export type Scene = {
+  id: string;
+  name: string;
+  formData: FormData;
+  lockState: LockState;
+  selectedSegment: TimeSegment | null;
+  outputFormat: OutputFormat;
+  generatedContent: string;
+  generatedJapanese: string;
+  showOutput: boolean;
+  copySuccess: boolean;
+  isGenerating: boolean;
+  references: ReferenceInfo[]; // 引用情報の配列
+};
+
+export type SceneManager = {
+  scenes: Scene[];
+  activeSceneId: string;
+};

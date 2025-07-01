@@ -2,7 +2,8 @@
 
 import styles from "../page.module.css";
 import FormField from "./FormField";
-import {VisualAudio, TONE_OPTIONS, LockState} from "../types";
+import ReferenceButton from "./ReferenceButton";
+import {VisualAudio, TONE_OPTIONS, LockState, Scene} from "../types";
 
 type VisualAudioSectionProps = {
   visualAudio: VisualAudio;
@@ -15,6 +16,11 @@ type VisualAudioSectionProps = {
   onLockToggle?: (section: "visual" | "aural", field: string) => void;
   onVisualUpdate?: (field: string, direction?: string) => Promise<void>;
   onAuralUpdate?: (field: string, direction?: string) => Promise<void>;
+  scenes: Scene[];
+  activeSceneId: string;
+  onReference: (sourceSceneId: string, fieldPath: string) => void;
+  getReferenceInfo: (fieldPath: string) => any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  isFieldReferenced: (fieldPath: string) => boolean;
 };
 
 export default function VisualAudioSection({
@@ -25,10 +31,25 @@ export default function VisualAudioSection({
   onLockToggle,
   onVisualUpdate,
   onAuralUpdate,
+  scenes,
+  activeSceneId,
+  onReference,
+  getReferenceInfo,
+  isFieldReferenced,
 }: VisualAudioSectionProps) {
   return (
     <section className={styles.formSection}>
-      <h2>Visual & Audio</h2>
+      <div className={styles.sectionHeader}>
+        <h2>Visual & Audio</h2>
+        <ReferenceButton
+          currentSceneId={activeSceneId}
+          scenes={scenes}
+          fieldPath="visual_audio"
+          onReference={onReference}
+          isReferenced={isFieldReferenced("visual_audio")}
+          referenceInfo={getReferenceInfo("visual_audio")}
+        />
+      </div>
       <div className={styles.subSection}>
         <h3>Visual</h3>
         <FormField

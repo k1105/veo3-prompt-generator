@@ -2,7 +2,8 @@
 
 import styles from "../page.module.css";
 import FormField from "./FormField";
-import {SpatialLayout, LockState} from "../types";
+import ReferenceButton from "./ReferenceButton";
+import {SpatialLayout, LockState, Scene} from "../types";
 
 type SpatialLayoutSectionProps = {
   spatialLayout: SpatialLayout;
@@ -10,6 +11,11 @@ type SpatialLayoutSectionProps = {
   lockState?: LockState["spatial_layout"];
   onLockToggle?: (field: string) => void;
   onUpdate?: (field: string, direction?: string) => Promise<void>;
+  scenes: Scene[];
+  activeSceneId: string;
+  onReference: (sourceSceneId: string, fieldPath: string) => void;
+  getReferenceInfo: (fieldPath: string) => any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  isFieldReferenced: (fieldPath: string) => boolean;
 };
 
 export default function SpatialLayoutSection({
@@ -18,10 +24,25 @@ export default function SpatialLayoutSection({
   lockState,
   onLockToggle,
   onUpdate,
+  scenes,
+  activeSceneId,
+  onReference,
+  getReferenceInfo,
+  isFieldReferenced,
 }: SpatialLayoutSectionProps) {
   return (
     <section className={styles.formSection}>
-      <h2>Spatial Layout</h2>
+      <div className={styles.sectionHeader}>
+        <h2>Spatial Layout</h2>
+        <ReferenceButton
+          currentSceneId={activeSceneId}
+          scenes={scenes}
+          fieldPath="spatial_layout"
+          onReference={onReference}
+          isReferenced={isFieldReferenced("spatial_layout")}
+          referenceInfo={getReferenceInfo("spatial_layout")}
+        />
+      </div>
       <FormField
         id="main"
         label="Main"

@@ -1,0 +1,178 @@
+.sceneManager {
+  background: var(--gray-alpha-100);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 24px;
+  border: 1px solid var(--gray-alpha-200);
+}
+
+.sceneTabs {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.tabContainer {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  flex: 1;
+  scrollbar-width: thin;
+  scrollbar-color: var(--gray-alpha-200) transparent;
+}
+
+.tabContainer::-webkit-scrollbar {
+  height: 4px;
+}
+
+.tabContainer::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.tabContainer::-webkit-scrollbar-thumb {
+  background: var(--gray-alpha-200);
+  border-radius: 2px;
+}
+
+.tabContainer::-webkit-scrollbar-thumb:hover {
+  background: var(--gray-alpha-100);
+}
+
+.sceneTab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: var(--background);
+  border: 1px solid var(--gray-alpha-200);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  min-width: 120px;
+  position: relative;
+}
+
+.sceneTab:hover {
+  background: var(--gray-alpha-50);
+  border-color: var(--gray-alpha-100);
+}
+
+.sceneTab.active {
+  background: var(--primary-light);
+  color: white;
+  border-color: var(--primary-light);
+  box-shadow: 0 2px 8px rgba(51, 154, 240, 0.3);
+}
+
+.sceneTab.active:hover {
+  background: var(--primary-dark);
+}
+
+.sceneName {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.editInput {
+  flex: 1;
+  background: var(--background);
+  border: 1px solid var(--primary-light);
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--foreground);
+  outline: none;
+}
+
+.sceneTab.active .editInput {
+  background: white;
+  color: var(--foreground);
+}
+
+.deleteButton {
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+  opacity: 0.7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+}
+
+.deleteButton:hover {
+  background: rgba(255, 255, 255, 0.2);
+  opacity: 1;
+}
+
+.sceneTab.active .deleteButton:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.createButton {
+  background: var(--gradient-primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.createButton:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.createButton:active {
+  transform: translateY(0);
+}
+
+@media (max-width: 768px) {
+  .sceneManager {
+    padding: 12px;
+    margin-bottom: 16px;
+  }
+
+  .sceneTabs {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .tabContainer {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .sceneTab {
+    min-width: 100px;
+    padding: 6px 12px;
+  }
+
+  .sceneName {
+    font-size: 13px;
+  }
+
+  .createButton {
+    width: 100%;
+    padding: 10px 16px;
+    font-size: 14px;
+  }
+}
