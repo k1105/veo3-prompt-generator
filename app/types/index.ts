@@ -240,3 +240,80 @@ export type VisualAudioSection = FormData["visual_audio"];
 export type VisualAudioSubsection = keyof VisualAudioSection;
 
 export type OutputFormat = "yaml" | "descriptive";
+
+// マルチシーン用の型定義
+export type ActionSegment = {
+  id: string;
+  segmentName: string;
+  action: string;
+  camera: string;
+};
+
+export type SceneSegment = {
+  id: string;
+  segmentName: string;
+  title: string;
+  description: string;
+};
+
+export type WorldSegment = {
+  id: string;
+  segmentName: string;
+  environment: string;
+  atmosphere: string;
+};
+
+export type EffectSegment = {
+  id: string;
+  segmentName: string;
+  visual: {
+    keyFX: string;
+    lighting: string;
+  };
+  aural: {
+    sfx: string;
+    bgm: string;
+    ambience: string;
+  };
+};
+
+export type StyleSegment = {
+  id: string;
+  segmentName: string;
+  tone: string[];
+  palette: string;
+};
+
+export type LayerType = "scene" | "world" | "effect" | "style" | "action";
+
+// 新しいデータ構造: SceneとSegmentを分離
+export type Scene = {
+  id: string;
+  name: string;
+  description: string;
+  segments: {
+    world?: string; // WorldSegmentのID
+    effect?: string; // EffectSegmentのID
+    style?: string; // StyleSegmentのID
+    actions: string[]; // ActionSegmentのID配列
+  };
+};
+
+export type SegmentType = "world" | "effect" | "style" | "action";
+
+// 既存のSegment型はそのまま使用
+export type MultiSceneFormData = {
+  scenes: Scene[];
+  worlds: WorldSegment[];
+  effects: EffectSegment[];
+  styles: StyleSegment[];
+  actions: ActionSegment[];
+};
+
+export type MultiSceneLockState = {
+  scenes: boolean;
+  worlds: boolean;
+  effects: boolean;
+  styles: boolean;
+  actions: boolean;
+};

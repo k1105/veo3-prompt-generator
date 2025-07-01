@@ -1,0 +1,103 @@
+.sceneTab {
+  padding: 1.5rem;
+  height: 100%;
+  overflow-y: auto;
+  background: var(--gray-alpha-150);
+}
+
+.emptyState {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-height: 400px;
+}
+
+.emptyContent {
+  text-align: center;
+  color: var(--gray-alpha-500);
+}
+
+.emptyContent h3 {
+  margin-bottom: 0.5rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.emptyContent p {
+  margin-bottom: 1.5rem;
+  font-size: 1rem;
+}
+
+.createSceneButton {
+  background: white;
+  color: black;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.createSceneButton:hover {
+  opacity: 0.8;
+}
+
+.timelineHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--gray-alpha-300);
+  padding-bottom: 1rem;
+}
+
+.sceneTabs {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  align-items: flex-start;
+}
+
+.sceneTab {
+  color: var(--gray-alpha-600);
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  min-width: 120px;
+}
+
+.activeSceneTab {
+  background: var(--primary-color);
+  color: white;
+}
+
+.activeSceneTab:hover {
+  background: var(--primary-color-dark);
+}
+
+.sceneTabName {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.sceneTabCount {
+  font-size: 0.75rem;
+  opacity: 0.8;
+  margin-top: 0.25rem;
+}
+
+.timelineContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.layerContainer {
+  width: 100%;
+}

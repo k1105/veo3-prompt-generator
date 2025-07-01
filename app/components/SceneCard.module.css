@@ -1,0 +1,97 @@
+.sceneCard {
+  border: 1px solid var(--gray-alpha-300);
+  border-radius: 8px;
+  padding: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: var(--gray-alpha-100);
+}
+
+.sceneCard:hover {
+  border-color: var(--primary-color);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  background: var(--gray-alpha-150);
+}
+
+.sceneHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.sceneHeader h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: white;
+}
+
+.sceneTime {
+  font-size: 0.875rem;
+  color: var(--gray-alpha-400);
+  font-weight: 500;
+}
+
+.sceneDescription {
+  margin: 0 0 1rem 0;
+  color: var(--gray-alpha-500);
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.segmentLayers {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.layer {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.layerLabel {
+  min-width: 60px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--gray-alpha-500);
+}
+
+.segmentContainer {
+  flex: 1;
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+}
+
+.segment {
+  padding: 0.25rem 0.75rem;
+  border-radius: 16px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: white;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+}
+
+.segment:hover {
+  opacity: 0.8;
+}
+
+.emptySegment {
+  color: var(--gray-alpha-500);
+  font-size: 0.8rem;
+  font-style: italic;
+}
+
+.actionSegments {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}

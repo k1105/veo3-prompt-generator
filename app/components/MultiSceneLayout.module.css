@@ -1,0 +1,99 @@
+.layout {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  margin: 20px auto;
+  width: 100%;
+  max-width: 1400px;
+  align-items: center;
+}
+
+.tabContainer {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  width: 100%;
+  max-width: 1200px;
+}
+
+.tab {
+  padding: 0.75rem 1.5rem;
+  border: 1px solid var(--gray-alpha-200);
+  background: var(--black);
+  border-radius: 8px 8px 0 0;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.tab:hover {
+  background: var(--gray-alpha-500);
+}
+
+.activeTab {
+  border-bottom: 1px solid white;
+}
+
+.tabContent {
+  width: 100%;
+  max-width: 1200px;
+  border: 1px solid var(--gray-alpha-200);
+  border-radius: 0 8px 8px 8px;
+  min-height: 400px;
+}
+
+.timelinePanel {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  overflow-y: auto;
+  padding: 0 1rem;
+}
+
+.layerContainer {
+  display: flex;
+  align-items: center;
+  gap: 0.1rem;
+  width: 100%;
+}
+
+.editorPanel {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  background: var(--gray-alpha-50);
+  border-radius: 8px;
+  padding: 1.5rem;
+  overflow-y: auto;
+  min-height: 300px;
+}
+
+.noSelection {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--gray-alpha-300);
+  font-size: 1.1rem;
+}
+
+@media (max-width: 768px) {
+  .timelinePanel {
+    width: 95vw;
+  }
+
+  .editorPanel {
+    width: 95vw;
+  }
+
+  .tabContainer {
+    width: 95vw;
+  }
+
+  .tabContent {
+    width: 95vw;
+  }
+}

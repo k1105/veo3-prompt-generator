@@ -5,14 +5,15 @@
   --gray-alpha-100: rgba(var(--gray-rgb), 0.05);
   --blue-alpha-100: rgba(var(--blue-rgb), 0.5);
 
-  display: grid;
-  grid-template-rows: 20px 1fr 20px;
-  align-items: start;
-  justify-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
   min-height: 100svh;
-  padding: 40px;
+  padding: 20px;
   gap: 32px;
   font-family: var(--font-geist-sans);
+  width: 100%;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -27,7 +28,9 @@
   display: flex;
   flex-direction: column;
   gap: 32px;
-  grid-row-start: 2;
+  width: 100%;
+  max-width: 1400px;
+  align-items: center;
 }
 
 .main ol {
@@ -251,6 +254,81 @@ a.secondary {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 8px;
+}
+
+.editableTitle {
+  cursor: pointer;
+  transition: color 0.2s ease;
+  border-radius: 4px;
+  padding: 4px 8px;
+  margin: 0;
+}
+
+.editableTitle:hover {
+  color: var(--button-primary-hover);
+  background-color: var(--gray-alpha-100);
+}
+
+.titleEditContainer {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.titleInput {
+  flex: 1;
+  padding: 8px 12px;
+  border: 2px solid var(--button-primary-hover);
+  border-radius: 4px;
+  font-size: 1.5rem;
+  font-weight: 600;
+  background: var(--background);
+  color: var(--foreground);
+  outline: none;
+}
+
+.titleInput:focus {
+  border-color: var(--foreground);
+}
+
+.titleEditButtons {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.titleSaveButton,
+.titleCancelButton {
+  padding: 6px 10px;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  min-width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.titleSaveButton {
+  background: var(--success);
+  color: white;
+}
+
+.titleSaveButton:hover {
+  background: var(--success-hover);
+}
+
+.titleCancelButton {
+  background: var(--error);
+  color: white;
+}
+
+.titleCancelButton:hover {
+  background: var(--error-hover);
 }
 
 .fieldButtons {
@@ -868,7 +946,7 @@ a.secondary {
 }
 
 .outputFormatSelector {
-  background: var(--gray-alpha-100);
+  background-color: black;
   border-radius: 12px;
   padding: 20px;
   margin: 24px 0;
@@ -956,12 +1034,12 @@ a.secondary {
   align-items: center;
   gap: 24px;
   margin: 24px 0;
+  flex-wrap: wrap;
 }
 
 .generateSection .outputFormatSelector {
   margin: 0;
   padding: 12px 16px;
-  background: var(--gray-alpha-50);
   border: 1px solid var(--gray-alpha-200);
 }
 
@@ -984,4 +1062,79 @@ a.secondary {
 
 .generateSection .formatOption span {
   font-size: 0.8rem;
+}
+
+.jsonExportButton {
+  appearance: none;
+  border-radius: 8px;
+  height: 48px;
+  padding: 0 20px;
+  border: 1px solid var(--gray-alpha-200);
+  background: var(--background);
+  color: var(--foreground);
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  line-height: 20px;
+  font-weight: 500;
+  gap: 8px;
+}
+
+.jsonExportButton:hover:not(:disabled) {
+  background: var(--gray-alpha-100);
+  border-color: var(--gray-alpha-200);
+}
+
+.jsonExportButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.jsonExportButton .spin {
+  animation: spin 1s linear infinite;
+}
+
+.jsonImportButton {
+  appearance: none;
+  border-radius: 8px;
+  height: 48px;
+  padding: 0 20px;
+  border: 1px solid var(--gray-alpha-200);
+  background: var(--background);
+  color: var(--foreground);
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  line-height: 20px;
+  font-weight: 500;
+  gap: 8px;
+}
+
+.jsonImportButton:hover:not(:disabled) {
+  background: var(--gray-alpha-100);
+  border-color: var(--gray-alpha-200);
+}
+
+.jsonImportButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.jsonImportButton .spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }

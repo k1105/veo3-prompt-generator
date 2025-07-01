@@ -203,7 +203,10 @@ export default function FormField({
           type="text"
           id={id}
           value={value as string}
-          onChange={(e) => onChange(e.target.value)}
+          onChange={(e) => {
+            console.log("FormField input onChange:", e.target.value);
+            onChange(e.target.value);
+          }}
           placeholder={placeholder}
           disabled={locked}
           className={locked ? styles.disabled : ""}

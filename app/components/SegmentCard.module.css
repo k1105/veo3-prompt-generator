@@ -1,0 +1,114 @@
+.segmentCard {
+  background: var(--gray-alpha-100);
+  border-radius: 8px;
+  padding: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 1rem;
+}
+
+.segmentCard:hover {
+  background: var(--gray-alpha-150);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.selectedSegment {
+  background: var(--primary-color-alpha-10);
+  border-color: var(--primary-color) !important;
+}
+
+.expandedSegment {
+  background: var(--gray-alpha-150);
+}
+
+.segmentHeader {
+  cursor: pointer;
+}
+
+.segmentContent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.segmentName {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: white;
+}
+
+.segmentDescription {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--gray-alpha-400);
+  line-height: 1.4;
+}
+
+.expandedContent {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--gray-alpha-300);
+}
+
+.expandedHeader {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1rem;
+}
+
+.deleteButton {
+  background: var(--danger-color);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.deleteButton:hover {
+  background: var(--danger-color-dark);
+}
+
+.expandedFields {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.expandedField {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.expandedField label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--gray-alpha-400);
+}
+
+.expandedField input,
+.expandedField textarea {
+  background: var(--gray-alpha-200);
+  border: 1px solid var(--gray-alpha-300);
+  border-radius: 4px;
+  padding: 0.5rem;
+  color: white;
+  font-size: 0.875rem;
+}
+
+.expandedField input:focus,
+.expandedField textarea:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  background: var(--gray-alpha-250);
+}
+
+.expandedField textarea {
+  resize: vertical;
+  min-height: 60px;
+}
