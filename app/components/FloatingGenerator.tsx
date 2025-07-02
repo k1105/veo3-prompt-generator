@@ -21,6 +21,9 @@ export default function FloatingGenerator({
   const [error, setError] = useState<string | null>(null);
   const [showInstructions, setShowInstructions] = useState(false);
   const [instructions, setInstructions] = useState("");
+  const [showPromptModal, setShowPromptModal] = useState(false);
+  const [promptText, setPromptText] = useState("");
+  const [isConverting, setIsConverting] = useState(false);
 
   const generateContent = async () => {
     // ロックされていない項目があるかチェック
@@ -231,51 +234,176 @@ export default function FloatingGenerator({
     }
   };
 
+  const convertPrompt = async () => {
+    if (!promptText.trim()) {
+      setError("プロンプトを入力してください");
+      return;
+    }
+
+    setIsConverting(true);
+    setError(null);
+
+    try {
+      const response = await fetch("/api/convert-prompt", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          prompt: promptText,
+          customApiKey: apiKey,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("プロンプト変換に失敗しました");
+      }
+
+      const data = await response.json();
+
+      // デバッグ用：変換されたデータをコンソールに出力
+      console.log("Converted data:", data);
+
+      // toneフィールドの検証とフィルタリング
+      if (
+        data.visual_audio &&
+        data.visual_audio.visual &&
+        data.visual_audio.visual.tone
+      ) {
+        const validToneValues = TONE_OPTIONS.map((option) => option.value);
+        const originalTone = data.visual_audio.visual.tone;
+
+        // 配列でない場合は配列に変換
+        const toneArray = Array.isArray(originalTone)
+          ? originalTone
+          : [originalTone];
+
+        // 有効な値のみをフィルタリング
+        const filteredTone = toneArray.filter((tone) =>
+          validToneValues.includes(tone)
+        );
+
+        // フィルタリングされたデータで更新
+        data.visual_audio.visual.tone = filteredTone;
+
+        // 無効な値があった場合はコンソールに警告
+        if (filteredTone.length !== toneArray.length) {
+          console.warn(
+            "Invalid tone values filtered out:",
+            toneArray.filter((tone) => !validToneValues.includes(tone))
+          );
+        }
+      }
+
+      onGenerate(data);
+      setShowPromptModal(false);
+      setPromptText("");
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "プロンプト変換中にエラーが発生しました"
+      );
+    } finally {
+      setIsConverting(false);
+    }
+  };
+
   return (
-    <div className={styles.floatingGenerator}>
-      {showInstructions && (
-        <div className={styles.floatingInstructions}>
-          <textarea
-            value={instructions}
-            onChange={(e) => setInstructions(e.target.value)}
-            placeholder="例：全体的に明るいトーンにして、ポップなプロットに書き換えて..."
-            className={styles.instructionsTextarea}
-            rows={3}
-          />
-          <div className={styles.instructionsButtons}>
-            <button
-              type="button"
-              onClick={() => setShowInstructions(false)}
-              className={styles.closeInstructionsButton}
-            >
-              閉じる
-            </button>
-            <button
-              type="button"
-              onClick={() => setInstructions("")}
-              className={styles.clearInstructionsButton}
-            >
-              クリア
-            </button>
+    <>
+      <div className={styles.floatingGenerator}>
+        {showInstructions && (
+          <div className={styles.floatingInstructions}>
+            <textarea
+              value={instructions}
+              onChange={(e) => setInstructions(e.target.value)}
+              placeholder="例：全体的に明るいトーンにして、ポップなプロットに書き換えて..."
+              className={styles.instructionsTextarea}
+              rows={3}
+            />
+            <div className={styles.instructionsButtons}>
+              <button
+                type="button"
+                onClick={() => setShowInstructions(false)}
+                className={styles.closeInstructionsButton}
+              >
+                閉じる
+              </button>
+              <button
+                type="button"
+                onClick={() => setInstructions("")}
+                className={styles.clearInstructionsButton}
+              >
+                クリア
+              </button>
+            </div>
+          </div>
+        )}
+        <button
+          type="button"
+          onClick={() => setShowPromptModal(true)}
+          className={styles.convertPromptButton}
+        >
+          プロンプト変換
+        </button>
+        <button
+          type="button"
+          onClick={() => setShowInstructions(!showInstructions)}
+          className={styles.toggleInstructionsButton}
+        >
+          {showInstructions ? "指示を隠す" : "指示を表示"}
+        </button>
+        <button
+          type="button"
+          onClick={generateContent}
+          disabled={isGenerating}
+          className={styles.floatingGenerateButton}
+        >
+          {isGenerating ? "生成中..." : "Fill / Update Fields"}
+        </button>
+        {error && <div className={styles.error}>{error}</div>}
+      </div>
+
+      {/* プロンプト変換モーダル */}
+      {showPromptModal && (
+        <div className={styles.promptModal}>
+          <div className={styles.promptModalContent}>
+            <div className={styles.promptModalHeader}>
+              <h3>プロンプト変換</h3>
+              <button
+                type="button"
+                onClick={() => setShowPromptModal(false)}
+                className={styles.promptModalClose}
+              >
+                ×
+              </button>
+            </div>
+            <textarea
+              value={promptText}
+              onChange={(e) => setPromptText(e.target.value)}
+              placeholder="既存のプロンプトをここに貼り付けてください..."
+              className={styles.promptModalTextarea}
+            />
+            <div className={styles.promptModalButtons}>
+              <button
+                type="button"
+                onClick={() => setShowPromptModal(false)}
+                className={styles.promptModalCancel}
+              >
+                キャンセル
+              </button>
+              <button
+                type="button"
+                onClick={convertPrompt}
+                disabled={isConverting}
+                className={styles.promptModalConvert}
+              >
+                {isConverting ? "変換中..." : "変換"}
+              </button>
+            </div>
           </div>
         </div>
       )}
-      <button
-        type="button"
-        onClick={() => setShowInstructions(!showInstructions)}
-        className={styles.toggleInstructionsButton}
-      >
-        {showInstructions ? "指示を隠す" : "指示を表示"}
-      </button>
-      <button
-        type="button"
-        onClick={generateContent}
-        disabled={isGenerating}
-        className={styles.floatingGenerateButton}
-      >
-        {isGenerating ? "生成中..." : "Fill / Update Fields"}
-      </button>
-      {error && <div className={styles.error}>{error}</div>}
-    </div>
+    </>
   );
 }

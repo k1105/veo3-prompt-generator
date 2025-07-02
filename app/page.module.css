@@ -828,6 +828,143 @@ a.secondary {
   text-align: center;
 }
 
+/* プロンプト変換モーダル */
+.promptModal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 20px;
+}
+
+.promptModalContent {
+  background: var(--background);
+  border-radius: 12px;
+  padding: 24px;
+  max-width: 600px;
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 16px 64px rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--gray-alpha-200);
+}
+
+.promptModalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.promptModalHeader h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+.promptModalClose {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: var(--foreground);
+  padding: 4px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.promptModalClose:hover {
+  background: var(--gray-alpha-100);
+}
+
+.promptModalTextarea {
+  width: 100%;
+  padding: 16px;
+  border: 1px solid var(--gray-alpha-200);
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.5;
+  background: var(--background);
+  color: var(--foreground);
+  resize: vertical;
+  min-height: 200px;
+  font-family: inherit;
+  margin-bottom: 20px;
+}
+
+.promptModalTextarea:focus {
+  outline: none;
+  border-color: var(--foreground);
+}
+
+.promptModalButtons {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.promptModalCancel,
+.promptModalConvert {
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid var(--gray-alpha-200);
+}
+
+.promptModalCancel {
+  background: var(--gray-alpha-100);
+  color: var(--foreground);
+}
+
+.promptModalCancel:hover {
+  background: var(--gray-alpha-200);
+}
+
+.promptModalConvert {
+  background: var(--gradient-primary);
+  color: white;
+  border-color: transparent;
+}
+
+.promptModalConvert:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
+}
+
+.promptModalConvert:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.convertPromptButton {
+  background: var(--gray-alpha-100);
+  color: var(--foreground);
+  border: 1px solid var(--gray-alpha-200);
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  white-space: nowrap;
+  margin-bottom: 8px;
+}
+
+.convertPromptButton:hover {
+  background: var(--gray-alpha-200);
+}
+
 @media (max-width: 768px) {
   .floatingGenerator {
     bottom: 20px;
@@ -844,11 +981,36 @@ a.secondary {
     align-self: stretch;
   }
 
+  .convertPromptButton {
+    align-self: stretch;
+  }
+
   .floatingGenerateButton {
     width: 100%;
     min-width: auto;
     padding: 14px 24px;
     font-size: 14px;
+  }
+
+  .promptModal {
+    padding: 10px;
+  }
+
+  .promptModalContent {
+    padding: 16px;
+  }
+
+  .promptModalTextarea {
+    min-height: 150px;
+  }
+
+  .promptModalButtons {
+    flex-direction: column;
+  }
+
+  .promptModalCancel,
+  .promptModalConvert {
+    width: 100%;
   }
 }
 

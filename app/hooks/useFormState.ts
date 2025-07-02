@@ -308,18 +308,46 @@ export const useFormState = () => {
     e.preventDefault();
     updateActiveScene({isGenerating: true});
 
-    generateYaml(formData)
-      .then((result) => {
-        updateActiveScene({
-          generatedContent: result,
-          showOutput: true,
-          isGenerating: false,
-        });
+    if (outputFormat === "descriptive") {
+      // Descriptive形式の場合はプロンプト生成APIを呼び出し
+      fetch("/api/generate-prompt", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          data: formData,
+          apiKey,
+        }),
       })
-      .catch((error) => {
-        console.error("Error generating YAML:", error);
-        updateActiveScene({isGenerating: false});
-      });
+        .then((response) => response.json())
+        .then((result) => {
+          updateActiveScene({
+            generatedContent: result.prompt,
+            generatedJapanese: result.japanese,
+            showOutput: true,
+            isGenerating: false,
+          });
+        })
+        .catch((error) => {
+          console.error("Error generating prompt:", error);
+          updateActiveScene({isGenerating: false});
+        });
+    } else {
+      // YAML形式の場合は従来のgenerateYaml関数を使用
+      generateYaml(formData)
+        .then((result) => {
+          updateActiveScene({
+            generatedContent: result,
+            showOutput: true,
+            isGenerating: false,
+          });
+        })
+        .catch((error) => {
+          console.error("Error generating YAML:", error);
+          updateActiveScene({isGenerating: false});
+        });
+    }
   };
 
   const handleGeneratedData = (data: Partial<FormData>) => {
