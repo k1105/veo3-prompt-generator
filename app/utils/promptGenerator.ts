@@ -29,15 +29,11 @@ export const generatePrompt = async (
     console.error("Prompt generation error:", error);
 
     // エラーが発生した場合は、シンプルなフォールバックプロンプトを生成
-    const tone = Array.isArray(data.visual_audio.visual.tone)
-      ? data.visual_audio.visual.tone.join(", ")
-      : data.visual_audio.visual.tone || "";
-
-    const mainSubject = data.spatial_layout.main || "central subject";
+    const style = data.visualStyle.style || "";
     const action = data.time_axis[0]?.action || "in focus";
     const camera = data.time_axis[0]?.camera || "";
 
-    const fallbackPrompt = `${tone} ${action} ${mainSubject}${
+    const fallbackPrompt = `${style} ${action} central subject${
       camera ? `, ${camera}` : ""
     }`;
 
