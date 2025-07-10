@@ -181,63 +181,80 @@ export const TONE_OPTIONS: ToneOption[] = [
   },
 ];
 
-export type VisualAudio = {
-  visual: {
-    tone: string[];
-    palette: string;
-    keyFX: string;
-    lighting: string;
-  };
-  aural: {
-    bgm: string;
-    sfx: string;
-    ambience: string;
-  };
+export type VisualStyle = {
+  style: string;
+  palette: string;
+  lighting: string;
+  cameraStyle: string;
 };
 
-export type SpatialLayout = {
-  main: string;
-  foreground: string;
-  midground: string;
-  background: string;
+export type VisualStyleField = {
+  [K in keyof VisualStyle]: string;
+};
+
+export type AudioDesign = {
+  bgm: string;
+  sfx: string;
+  ambience: string;
+  dialogue: string;
+  voiceover: string;
+};
+
+export type Character = {
+  name: string;
+  description: string;
+  performanceNote: string;
+};
+
+export type Setting = {
+  location: string;
+  timeOfDay: string;
+  weather: string;
+  backgroundElements: string;
 };
 
 export type FormData = {
   title: string;
-  synopsis: string;
-  visual_audio: VisualAudio;
-  spatial_layout: SpatialLayout;
+  concept: string;
+  summary: string;
+  characters: Character[];
+  setting: Setting;
+  visualStyle: VisualStyle;
+  audioDesign: AudioDesign;
   time_axis: TimeSegment[];
 };
 
 // ロック状態を管理する型
 export type LockState = {
   title: boolean;
-  synopsis: boolean;
-  visual_audio: {
-    visual: {
-      tone: boolean;
-      palette: boolean;
-      keyFX: boolean;
-      lighting: boolean;
-    };
-    aural: {
-      bgm: boolean;
-      sfx: boolean;
-      ambience: boolean;
-    };
+  concept: boolean;
+  summary: boolean;
+  characters: boolean;
+  setting: {
+    location: boolean;
+    timeOfDay: boolean;
+    weather: boolean;
+    backgroundElements: boolean;
   };
-  spatial_layout: {
-    main: boolean;
-    foreground: boolean;
-    midground: boolean;
-    background: boolean;
+  visualStyle: {
+    style: boolean;
+    palette: boolean;
+    lighting: boolean;
+    cameraStyle: boolean;
   };
+  audioDesign: {
+    bgm: boolean;
+    sfx: boolean;
+    ambience: boolean;
+    dialogue: boolean;
+    voiceover: boolean;
+  };
+
   time_axis: boolean;
 };
 
-export type VisualAudioSection = FormData["visual_audio"];
-export type VisualAudioSubsection = keyof VisualAudioSection;
+export type VisualStyleSection = FormData["visualStyle"];
+export type AudioDesignSection = FormData["audioDesign"];
 
 export type OutputFormat = "yaml" | "descriptive";
 
@@ -267,3 +284,20 @@ export type SceneManager = {
   scenes: Scene[];
   activeSceneId: string;
 };
+
+export interface ChatMessage {
+  id: string;
+  type: "user" | "assistant";
+  content: string;
+  timestamp: Date;
+  metadata?: {
+    updatedFields?: Partial<FormData>;
+    suggestions?: string[];
+  };
+}
+
+export interface ChatState {
+  messages: ChatMessage[];
+  isLoading: boolean;
+  error: string | null;
+}

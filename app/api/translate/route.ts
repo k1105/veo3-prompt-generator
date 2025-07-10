@@ -32,24 +32,30 @@ ${content}
 JSON形式で回答：
 {
   "title": "英語タイトル",
-  "synopsis": "英語シノプシス",
+  "concept": "英語コンセプト",
+  "summary": "英語サマリー",
   "visual": {
-    "tone": "英語トーン",
+    "style": "英語スタイル",
+    "moodTone": "英語ムード/トーン",
     "palette": "英語パレット",
-    "keyFX": "英語キーFX",
-    "camera": "英語カメラ",
-    "lighting": "英語照明"
+    "lighting": "英語照明",
+    "cameraStyle": "英語カメラスタイル"
   },
   "aural": {
     "bgm": "英語BGM",
     "sfx": "英語SFX",
-    "ambience": "英語環境音"
+    "ambience": "英語環境音",
+    "dialogue": "英語対話",
+    "voiceover": "英語ナレーション"
   },
-  "spatial": {
-    "main": "英語メイン",
-    "foreground": "英語前景",
-    "midground": "英語中景",
-    "background": "英語背景"
+  "characters": [
+    {"name": "英語キャラクター名", "description": "英語キャラクター説明", "performanceNote": "英語演技ノート"}
+  ],
+  "setting": {
+    "location": "英語場所",
+    "timeOfDay": "英語時間帯",
+    "weather": "英語天気",
+    "backgroundElements": "英語背景要素"
   },
   "time_axis": [
     {"action": "英語アクション1", "camera": "英語カメラ1"},

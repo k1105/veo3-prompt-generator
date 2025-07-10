@@ -7,7 +7,14 @@ import FormField from "./FormField";
 import LockButton from "./LockButton";
 import PreviewButton from "./PreviewButton";
 import ReferenceButton from "./ReferenceButton";
-import {TimeSegment, VisualAudio, SpatialLayout, Scene} from "../types";
+import {
+  TimeSegment,
+  VisualStyle,
+  AudioDesign,
+  Setting,
+  Character,
+  Scene,
+} from "../types";
 
 type TimeAxisSectionProps = {
   totalDuration: number;
@@ -23,10 +30,13 @@ type TimeAxisSectionProps = {
   onLockToggle?: () => void;
   onSegmentActionUpdate?: (direction?: string) => Promise<void>;
   onSegmentCameraUpdate?: (direction?: string) => Promise<void>;
-  visualAudio: VisualAudio;
-  spatialLayout: SpatialLayout;
+  visualStyle: VisualStyle;
+  audioDesign: AudioDesign;
+  setting: Setting;
+  characters: Character[];
   title: string;
-  synopsis: string;
+  concept: string;
+  summary: string;
   apiKey: string;
   scenes: Scene[];
   activeSceneId: string;
@@ -49,10 +59,13 @@ export default function TimeAxisSection({
   onLockToggle,
   onSegmentActionUpdate,
   onSegmentCameraUpdate,
-  visualAudio,
-  spatialLayout,
+  visualStyle,
+  audioDesign,
+  setting,
+  characters,
   title,
-  synopsis,
+  concept,
+  summary,
   apiKey,
   scenes,
   activeSceneId,
@@ -172,10 +185,13 @@ export default function TimeAxisSection({
           />
           <PreviewButton
             segment={selectedSegment}
-            visualAudio={visualAudio}
-            spatialLayout={spatialLayout}
+            visualStyle={visualStyle}
+            audioDesign={audioDesign}
+            setting={setting}
+            characters={characters}
             title={title}
-            synopsis={synopsis}
+            concept={concept}
+            summary={summary}
             apiKey={apiKey}
           />
         </div>

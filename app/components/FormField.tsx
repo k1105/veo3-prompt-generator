@@ -152,7 +152,7 @@ export default function FormField({
         )}
         <select
           id={id}
-          value={value as string}
+          value={(value as string) || ""}
           onChange={(e) => onChange(e.target.value)}
           disabled={locked}
           className={locked ? styles.disabled : ""}
@@ -191,7 +191,7 @@ export default function FormField({
       {type === "textarea" ? (
         <textarea
           id={id}
-          value={value as string}
+          value={(value as string) || ""}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
           rows={rows}
@@ -202,7 +202,7 @@ export default function FormField({
         <input
           type="text"
           id={id}
-          value={value as string}
+          value={(value as string) || ""}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
           disabled={locked}

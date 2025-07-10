@@ -5,6 +5,9 @@ import {
   OutputFormat,
   Scene,
   ReferenceInfo,
+  Character,
+  VisualStyle,
+  AudioDesign,
 } from "../types";
 import {generateYaml} from "../utils/yamlGenerator";
 
@@ -13,81 +16,53 @@ const createDefaultScene = (id: string, name: string): Scene => ({
   name,
   formData: {
     title: "",
-    synopsis: "",
-    visual_audio: {
-      visual: {
-        tone: [],
-        palette: "",
-        keyFX: "",
-        lighting: "",
-      },
-      aural: {
-        bgm: "",
-        sfx: "",
-        ambience: "",
-      },
+    concept: "",
+    summary: "",
+    characters: [],
+    setting: {
+      location: "",
+      timeOfDay: "",
+      weather: "",
+      backgroundElements: "",
     },
-    spatial_layout: {
-      main: "",
-      foreground: "",
-      midground: "",
-      background: "",
+    visualStyle: {
+      style: "",
+      palette: "",
+      lighting: "",
+      cameraStyle: "",
     },
-    time_axis: [
-      {
-        id: "1",
-        startTime: 0,
-        endTime: 2.0,
-        action:
-          "camera pushes in; talisman scroll unfurls; faint sparks flicker",
-        camera: "slow push-in",
-      },
-      {
-        id: "2",
-        startTime: 2.0,
-        endTime: 5.0,
-        action: 'first katana slash; sparks sculpt "Y" and "A"; orbit quickens',
-        camera: "steady medium shot",
-      },
-      {
-        id: "3",
-        startTime: 5.0,
-        endTime: 7.0,
-        action:
-          'second slash forges "M" and "L"; letters align above blade tip',
-        camera: "close-up on blade",
-      },
-      {
-        id: "4",
-        startTime: 7.0,
-        endTime: 8.0,
-        action:
-          'glyphs fuse into blazing "YAML" sigil; bright flash → iris-out',
-        camera: "wide shot with iris-out",
-      },
-    ],
+    audioDesign: {
+      bgm: "",
+      sfx: "",
+      ambience: "",
+      dialogue: "",
+      voiceover: "",
+    },
+    time_axis: [],
   },
   lockState: {
     title: false,
-    synopsis: false,
-    visual_audio: {
-      visual: {
-        tone: false,
-        palette: false,
-        keyFX: false,
-        lighting: false,
-      },
-      aural: {
-        bgm: false,
-        sfx: false,
-        ambience: false,
-      },
+    concept: false,
+    summary: false,
+    characters: false,
+    setting: {
+      location: false,
+      timeOfDay: false,
+      weather: false,
+      backgroundElements: false,
     },
-    spatial_layout: {
-      main: false,
-      foreground: false,
-      midground: false,
-      background: false,
+    visualStyle: {
+      style: false,
+      palette: false,
+      lighting: false,
+      cameraStyle: false,
+    },
+    audioDesign: {
+      bgm: false,
+      sfx: false,
+      ambience: false,
+      dialogue: false,
+      voiceover: false,
     },
     time_axis: false,
   },
@@ -177,27 +152,36 @@ export const useFormState = () => {
     const newFormData = {
       ...formData,
       [section]:
-        section === "spatial_layout"
-          ? {...formData[section], [field]: value}
-          : value,
+        section === "setting" ? {...formData[section], [field]: value} : value,
     };
     updateActiveScene({formData: newFormData});
   };
 
-  const handleNestedInputChange = (
-    section: "visual_audio",
-    subsection: "visual" | "aural",
-    field: string,
-    value: string | string[]
-  ) => {
+  const handleCharactersChange = (characters: Character[]) => {
     const newFormData = {
       ...formData,
-      visual_audio: {
-        ...formData.visual_audio,
-        [subsection]: {
-          ...formData.visual_audio[subsection],
-          [field]: value,
-        },
+      characters,
+    };
+    updateActiveScene({formData: newFormData});
+  };
+
+  const handleVisualStyleChange = (field: keyof VisualStyle, value: string) => {
+    const newFormData = {
+      ...formData,
+      visualStyle: {
+        ...formData.visualStyle,
+        [field]: value,
+      },
+    };
+    updateActiveScene({formData: newFormData});
+  };
+
+  const handleAudioDesignChange = (field: keyof AudioDesign, value: string) => {
+    const newFormData = {
+      ...formData,
+      audioDesign: {
+        ...formData.audioDesign,
+        [field]: value,
       },
     };
     updateActiveScene({formData: newFormData});
@@ -350,38 +334,32 @@ export const useFormState = () => {
     }
   };
 
-  const handleGeneratedData = (data: Partial<FormData>) => {
-    const newFormData = {...formData, ...data};
-    updateActiveScene({formData: newFormData});
+  const handleGeneratedData = (data: FormData) => {
+    updateActiveScene({formData: data});
   };
 
-  const handleLockToggle = (
-    section: string,
-    field: string,
-    subsection?: string
-  ) => {
+  const handleLockToggle = (section: string, field: string) => {
     const newLockState = {...lockState};
 
-    if (section === "visual_audio" && subsection) {
-      if (subsection === "visual") {
-        const visualField =
-          field as keyof typeof newLockState.visual_audio.visual;
-        newLockState.visual_audio.visual[visualField] =
-          !newLockState.visual_audio.visual[visualField];
-      } else if (subsection === "aural") {
-        const auralField =
-          field as keyof typeof newLockState.visual_audio.aural;
-        newLockState.visual_audio.aural[auralField] =
-          !newLockState.visual_audio.aural[auralField];
-      }
-    } else if (section === "spatial_layout") {
-      const spatialField = field as keyof typeof newLockState.spatial_layout;
-      newLockState.spatial_layout[spatialField] =
-        !newLockState.spatial_layout[spatialField];
+    if (section === "visualStyle") {
+      const visualStyleField = field as keyof typeof newLockState.visualStyle;
+      newLockState.visualStyle[visualStyleField] =
+        !newLockState.visualStyle[visualStyleField];
+    } else if (section === "audioDesign") {
+      const audioDesignField = field as keyof typeof newLockState.audioDesign;
+      newLockState.audioDesign[audioDesignField] =
+        !newLockState.audioDesign[audioDesignField];
+    } else if (section === "setting") {
+      const settingField = field as keyof typeof newLockState.setting;
+      newLockState.setting[settingField] = !newLockState.setting[settingField];
+    } else if (section === "characters") {
+      newLockState.characters = !newLockState.characters;
     } else if (section === "title") {
       newLockState.title = !newLockState.title;
-    } else if (section === "synopsis") {
-      newLockState.synopsis = !newLockState.synopsis;
+    } else if (section === "concept") {
+      newLockState.concept = !newLockState.concept;
+    } else if (section === "summary") {
+      newLockState.summary = !newLockState.summary;
     } else if (section === "time_axis") {
       newLockState.time_axis = !newLockState.time_axis;
     }
@@ -401,23 +379,25 @@ export const useFormState = () => {
 
       if (field === "title") {
         currentValue = formData.title;
-      } else if (field === "synopsis") {
-        currentValue = formData.synopsis;
-      } else if (field.startsWith("visual.")) {
-        const visualField = field.split(
+      } else if (field === "concept") {
+        currentValue = formData.concept;
+      } else if (field === "summary") {
+        currentValue = formData.summary;
+      } else if (field.startsWith("visualStyle.")) {
+        const visualStyleField = field.split(
           "."
-        )[1] as keyof FormData["visual_audio"]["visual"];
-        currentValue = formData.visual_audio.visual[visualField] as string;
-      } else if (field.startsWith("aural.")) {
-        const auralField = field.split(
+        )[1] as keyof FormData["visualStyle"];
+        currentValue = Array.isArray(formData.visualStyle[visualStyleField])
+          ? formData.visualStyle[visualStyleField].join(", ")
+          : formData.visualStyle[visualStyleField];
+      } else if (field.startsWith("audioDesign.")) {
+        const audioDesignField = field.split(
           "."
-        )[1] as keyof FormData["visual_audio"]["aural"];
-        currentValue = formData.visual_audio.aural[auralField];
-      } else if (field.startsWith("spatial_layout.")) {
-        const spatialField = field.split(
-          "."
-        )[1] as keyof FormData["spatial_layout"];
-        currentValue = formData.spatial_layout[spatialField];
+        )[1] as keyof FormData["audioDesign"];
+        currentValue = formData.audioDesign[audioDesignField];
+      } else if (field.startsWith("setting.")) {
+        const settingField = field.split(".")[1] as keyof FormData["setting"];
+        currentValue = formData.setting[settingField];
       } else if (field === "segmentAction" && selectedSegment) {
         currentValue = selectedSegment.action;
       } else if (field === "segmentCamera" && selectedSegment) {
@@ -434,7 +414,7 @@ export const useFormState = () => {
         field,
         currentValue,
         direction,
-        context: `Title: ${formData.title}, Synopsis: ${formData.synopsis}`,
+        context: `Title: ${formData.title}, Concept: ${formData.concept}, Summary: ${formData.summary}`,
         ...(apiKey && {customApiKey: apiKey}),
       };
 
@@ -454,33 +434,23 @@ export const useFormState = () => {
 
       if (field === "title") {
         handleInputChange("title", "title", data.updatedValue);
-      } else if (field === "synopsis") {
-        handleInputChange("synopsis", "synopsis", data.updatedValue);
-      } else if (field.startsWith("visual.")) {
-        const visualField = field.split(
+      } else if (field === "concept") {
+        handleInputChange("concept", "concept", data.updatedValue);
+      } else if (field === "summary") {
+        handleInputChange("summary", "summary", data.updatedValue);
+      } else if (field.startsWith("visualStyle.")) {
+        const visualStyleField = field.split(
           "."
-        )[1] as keyof FormData["visual_audio"]["visual"];
-        handleNestedInputChange(
-          "visual_audio",
-          "visual",
-          visualField,
-          data.updatedValue
-        );
-      } else if (field.startsWith("aural.")) {
-        const auralField = field.split(
+        )[1] as keyof FormData["visualStyle"];
+        handleVisualStyleChange(visualStyleField, data.updatedValue);
+      } else if (field.startsWith("audioDesign.")) {
+        const audioDesignField = field.split(
           "."
-        )[1] as keyof FormData["visual_audio"]["aural"];
-        handleNestedInputChange(
-          "visual_audio",
-          "aural",
-          auralField,
-          data.updatedValue
-        );
-      } else if (field.startsWith("spatial_layout.")) {
-        const spatialField = field.split(
-          "."
-        )[1] as keyof FormData["spatial_layout"];
-        handleInputChange("spatial_layout", spatialField, data.updatedValue);
+        )[1] as keyof FormData["audioDesign"];
+        handleAudioDesignChange(audioDesignField, data.updatedValue);
+      } else if (field.startsWith("setting.")) {
+        const settingField = field.split(".")[1] as keyof FormData["setting"];
+        handleInputChange("setting", settingField, data.updatedValue);
       } else if (field === "segmentAction" && selectedSegment) {
         handleSegmentActionChange(data.updatedValue);
       } else if (field === "segmentCamera" && selectedSegment) {
@@ -582,7 +552,8 @@ export const useFormState = () => {
     setOutputFormat,
     setApiKey,
     handleInputChange,
-    handleNestedInputChange,
+    handleVisualStyleChange,
+    handleAudioDesignChange,
     handleTimeAxisChange,
     handleSegmentSelect,
     handleSegmentActionChange,
@@ -594,5 +565,6 @@ export const useFormState = () => {
     handleGeneratedData,
     handleLockToggle,
     handleFieldUpdate,
+    handleCharactersChange,
   };
 };

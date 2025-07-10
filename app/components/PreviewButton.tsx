@@ -1,24 +1,36 @@
 "use client";
 
 import {useState, useEffect} from "react";
-import {TimeSegment, VisualAudio, SpatialLayout} from "../types";
+import {
+  TimeSegment,
+  VisualStyle,
+  AudioDesign,
+  Setting,
+  Character,
+} from "../types";
 import {generateImagePrompt} from "../utils/imagePromptGenerator";
 
 type PreviewButtonProps = {
   segment: TimeSegment;
-  visualAudio: VisualAudio;
-  spatialLayout: SpatialLayout;
+  visualStyle: VisualStyle;
+  audioDesign: AudioDesign;
+  setting: Setting;
+  characters: Character[];
   title: string;
-  synopsis: string;
+  concept: string;
+  summary: string;
   apiKey: string;
 };
 
 export default function PreviewButton({
   segment,
-  visualAudio,
-  spatialLayout,
+  visualStyle,
+  audioDesign,
+  setting,
+  characters,
   title,
-  synopsis,
+  concept,
+  summary,
   apiKey,
 }: PreviewButtonProps) {
   const [isGenerating, setIsGenerating] = useState(false);
@@ -52,10 +64,13 @@ export default function PreviewButton({
     try {
       const prompt = generateImagePrompt(
         segment,
-        visualAudio,
-        spatialLayout,
+        visualStyle,
+        audioDesign,
+        setting,
+        characters,
         title,
-        synopsis
+        concept,
+        summary
       );
 
       const response = await fetch("/api/generate-image", {

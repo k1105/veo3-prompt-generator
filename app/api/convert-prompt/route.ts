@@ -29,25 +29,34 @@ ${prompt}
 
 {
   "title": "映画のタイトル",
-  "synopsis": "映画の概要・ストーリー",
-  "visual_audio": {
-    "visual": {
-      "tone": ["cinematic film of", "anime style"],
-      "palette": "色調・パレットの説明",
-      "keyFX": "主要な視覚効果",
-      "lighting": "照明の説明"
-    },
-    "aural": {
-      "bgm": "BGMの説明",
-      "sfx": "効果音の説明",
-      "ambience": "環境音の説明"
-    }
+  "concept": "映画のコンセプト・テーマ",
+  "summary": "映画の概要・ストーリー",
+  "visualStyle": {
+    "style": "視覚スタイルの説明",
+
+    "palette": "色調・パレットの説明",
+    "lighting": "照明の説明",
+    "cameraStyle": "カメラスタイルの説明"
   },
-  "spatial_layout": {
-    "main": "メイン被写体の説明",
-    "foreground": "前景の説明",
-    "midground": "中景の説明",
-    "background": "背景の説明"
+  "audioDesign": {
+    "bgm": "BGMの説明",
+    "sfx": "効果音の説明",
+    "ambience": "環境音の説明",
+    "dialogue": "対話・セリフの説明",
+    "voiceover": "ナレーションの説明"
+  },
+  "characters": [
+    {
+      "name": "キャラクター名",
+      "description": "キャラクターの説明",
+      "performanceNote": "演技ノート"
+    }
+  ],
+  "setting": {
+    "location": "場所の説明",
+    "timeOfDay": "時間帯の説明",
+    "weather": "天気の説明",
+    "backgroundElements": "背景要素の説明"
   },
   "time_axis": [
     {

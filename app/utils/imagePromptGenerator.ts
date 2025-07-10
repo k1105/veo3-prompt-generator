@@ -1,54 +1,60 @@
-import {TimeSegment, VisualAudio, SpatialLayout} from "../types";
+import {
+  TimeSegment,
+  VisualStyle,
+  AudioDesign,
+  Setting,
+  Character,
+} from "../types";
 
 export function generateImagePrompt(
   segment: TimeSegment,
-  visualAudio: VisualAudio,
-  spatialLayout: SpatialLayout,
+  visualStyle: VisualStyle,
+  audioDesign: AudioDesign,
+  setting: Setting,
+  characters: Character[],
   title: string,
-  synopsis: string
+  concept: string,
+  summary: string
 ): string {
   const {action} = segment;
-  const {visual} = visualAudio;
-  const {main, foreground, midground, background} = spatialLayout;
+  const {style, palette, lighting, cameraStyle} = visualStyle;
+  const {location, timeOfDay, weather, backgroundElements} = setting;
 
   // 画像生成用のプロンプト（直接的な画像生成指示）
   let prompt = `Create a cinematic still image: `;
 
-  if (synopsis) {
-    prompt += `Context: ${synopsis}. `;
+  if (summary) {
+    prompt += `Context: ${summary}. `;
   }
 
   prompt += `Scene: ${action}. `;
 
-  // 空間レイアウト情報
-  if (main) {
-    prompt += `Main subject: ${main}. `;
+  // 設定情報
+  if (location) {
+    prompt += `Location: ${location}. `;
   }
-  if (foreground) {
-    prompt += `Foreground: ${foreground}. `;
+  if (timeOfDay) {
+    prompt += `Time of day: ${timeOfDay}. `;
   }
-  if (midground) {
-    prompt += `Midground: ${midground}. `;
+  if (weather) {
+    prompt += `Weather: ${weather}. `;
   }
-  if (background) {
-    prompt += `Background: ${background}. `;
+  if (backgroundElements) {
+    prompt += `Background elements: ${backgroundElements}. `;
   }
 
   // ビジュアル設定
-  if (visual.tone && visual.tone.length > 0) {
-    prompt += `Visual style: ${visual.tone.join(", ")}. `;
+  if (style) {
+    prompt += `Visual style: ${style}. `;
   }
-  if (visual.palette) {
-    prompt += `Color palette: ${visual.palette}. `;
+  if (palette) {
+    prompt += `Color palette: ${palette}. `;
   }
-  if (visual.keyFX) {
-    prompt += `Special effects: ${visual.keyFX}. `;
+  if (cameraStyle) {
+    prompt += `Camera style: ${cameraStyle}. `;
   }
-  if (segment.camera) {
-    prompt += `Camera angle: ${segment.camera}. `;
-  }
-  if (visual.lighting) {
-    prompt += `Lighting: ${visual.lighting}. `;
+  if (lighting) {
+    prompt += `Lighting: ${lighting}. `;
   }
 
   prompt += `High quality, cinematic photography, professional film still, dramatic lighting, detailed composition.`;

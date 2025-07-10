@@ -79,29 +79,27 @@ Do not include any explanations, justifications, or additional commentary.`;
 const formatDataForGemini = (data: FormData): string => {
   const yamlData = {
     title: data.title || "",
-    synopsis: data.synopsis || "",
-    visual_audio: {
-      visual: {
-        tone: Array.isArray(data.visual_audio.visual.tone)
-          ? data.visual_audio.visual.tone.join(", ")
-          : data.visual_audio.visual.tone || "",
-        palette: data.visual_audio.visual.palette || "",
-        keyFX: data.visual_audio.visual.keyFX || "",
-        lighting: data.visual_audio.visual.lighting || "",
-      },
-      aural: {
-        bgm: data.visual_audio.aural.bgm || "",
-        sfx: data.visual_audio.aural.sfx || "",
-        ambience: data.visual_audio.aural.ambience || "",
-      },
+    summary: data.summary || "",
+    visualStyle: {
+      style: data.visualStyle?.style || "",
+      palette: data.visualStyle?.palette || "",
+      lighting: data.visualStyle?.lighting || "",
+      cameraStyle: data.visualStyle?.cameraStyle || "",
     },
-    spatial_layout: {
-      main: data.spatial_layout.main || "",
-      foreground: data.spatial_layout.foreground || "",
-      midground: data.spatial_layout.midground || "",
-      background: data.spatial_layout.background || "",
+    audioDesign: {
+      bgm: data.audioDesign?.bgm || "",
+      sfx: data.audioDesign?.sfx || "",
+      ambience: data.audioDesign?.ambience || "",
+      dialogue: data.audioDesign?.dialogue || "",
+      voiceover: data.audioDesign?.voiceover || "",
     },
-    time_axis: data.time_axis.map((segment: TimeSegment) => ({
+    setting: {
+      location: data.setting?.location || "",
+      timeOfDay: data.setting?.timeOfDay || "",
+      weather: data.setting?.weather || "",
+      backgroundElements: data.setting?.backgroundElements || "",
+    },
+    time_axis: (data.time_axis || []).map((segment: TimeSegment) => ({
       action: segment.action,
       camera: segment.camera,
     })),
@@ -226,27 +224,27 @@ export async function POST(request: NextRequest) {
     // 翻訳用のコンテンツを準備
     const contentToTranslate = {
       title: data.title || "",
-      synopsis: data.synopsis || "",
+      summary: data.summary || "",
       visual: {
-        tone: Array.isArray(data.visual_audio.visual.tone)
-          ? data.visual_audio.visual.tone.join(", ")
-          : data.visual_audio.visual.tone || "",
-        palette: data.visual_audio.visual.palette || "",
-        keyFX: data.visual_audio.visual.keyFX || "",
-        lighting: data.visual_audio.visual.lighting || "",
+        palette: data.visualStyle?.palette || "",
+        style: data.visualStyle?.style || "",
+        lighting: data.visualStyle?.lighting || "",
+        cameraStyle: data.visualStyle?.cameraStyle || "",
       },
       aural: {
-        bgm: data.visual_audio.aural.bgm || "",
-        sfx: data.visual_audio.aural.sfx || "",
-        ambience: data.visual_audio.aural.ambience || "",
+        bgm: data.audioDesign?.bgm || "",
+        sfx: data.audioDesign?.sfx || "",
+        ambience: data.audioDesign?.ambience || "",
+        dialogue: data.audioDesign?.dialogue || "",
+        voiceover: data.audioDesign?.voiceover || "",
       },
-      spatial: {
-        main: data.spatial_layout.main || "",
-        foreground: data.spatial_layout.foreground || "",
-        midground: data.spatial_layout.midground || "",
-        background: data.spatial_layout.background || "",
+      setting: {
+        location: data.setting?.location || "",
+        timeOfDay: data.setting?.timeOfDay || "",
+        weather: data.setting?.weather || "",
+        backgroundElements: data.setting?.backgroundElements || "",
       },
-      time_axis: data.time_axis.map((segment: TimeSegment) => ({
+      time_axis: (data.time_axis || []).map((segment: TimeSegment) => ({
         action: segment.action,
         camera: segment.camera,
       })),
@@ -312,38 +310,49 @@ export async function POST(request: NextRequest) {
     const translatedFormData = {
       ...data,
       title: translatedData.title || data.title,
-      synopsis: translatedData.synopsis || data.synopsis,
-      visual_audio: {
-        visual: {
-          tone: data.visual_audio.visual.tone,
-          palette:
-            translatedData.visual?.palette || data.visual_audio.visual.palette,
-          keyFX: translatedData.visual?.keyFX || data.visual_audio.visual.keyFX,
-          lighting:
-            translatedData.visual?.lighting ||
-            data.visual_audio.visual.lighting,
-        },
-        aural: {
-          bgm: translatedData.aural?.bgm || data.visual_audio.aural.bgm,
-          sfx: translatedData.aural?.sfx || data.visual_audio.aural.sfx,
-          ambience:
-            translatedData.aural?.ambience || data.visual_audio.aural.ambience,
-        },
+      summary: translatedData.summary || data.summary,
+      visualStyle: {
+        ...data.visualStyle,
+        style: translatedData.visual?.style || data.visualStyle?.style || "",
+        palette:
+          translatedData.visual?.palette || data.visualStyle?.palette || "",
+        lighting:
+          translatedData.visual?.lighting || data.visualStyle?.lighting || "",
+        cameraStyle:
+          translatedData.visual?.cameraStyle ||
+          data.visualStyle?.cameraStyle ||
+          "",
       },
-      spatial_layout: {
-        main: translatedData.spatial?.main || data.spatial_layout.main,
-        foreground:
-          translatedData.spatial?.foreground || data.spatial_layout.foreground,
-        midground:
-          translatedData.spatial?.midground || data.spatial_layout.midground,
-        background:
-          translatedData.spatial?.background || data.spatial_layout.background,
+      audioDesign: {
+        ...data.audioDesign,
+        bgm: translatedData.aural?.bgm || data.audioDesign?.bgm || "",
+        sfx: translatedData.aural?.sfx || data.audioDesign?.sfx || "",
+        ambience:
+          translatedData.aural?.ambience || data.audioDesign?.ambience || "",
+        dialogue:
+          translatedData.aural?.dialogue || data.audioDesign?.dialogue || "",
+        voiceover:
+          translatedData.aural?.voiceover || data.audioDesign?.voiceover || "",
       },
-      time_axis: data.time_axis.map((segment: TimeSegment, index: number) => ({
-        ...segment,
-        action: translatedData.time_axis?.[index]?.action || segment.action,
-        camera: translatedData.time_axis?.[index]?.camera || segment.camera,
-      })),
+      setting: {
+        ...data.setting,
+        location:
+          translatedData.setting?.location || data.setting?.location || "",
+        timeOfDay:
+          translatedData.setting?.timeOfDay || data.setting?.timeOfDay || "",
+        weather: translatedData.setting?.weather || data.setting?.weather || "",
+        backgroundElements:
+          translatedData.setting?.backgroundElements ||
+          data.setting?.backgroundElements ||
+          "",
+      },
+      time_axis: (data.time_axis || []).map(
+        (segment: TimeSegment, index: number) => ({
+          ...segment,
+          action: translatedData.time_axis?.[index]?.action || segment.action,
+          camera: translatedData.time_axis?.[index]?.camera || segment.camera,
+        })
+      ),
     };
 
     // Geminiにベストプラクティスプロンプトを送信

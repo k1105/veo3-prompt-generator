@@ -13,25 +13,31 @@ export const generateYaml = async (data: FormData): Promise<string> => {
   // 翻訳用のコンテンツを準備（最適化版）
   const contentToTranslate = {
     title: data.title || "",
-    synopsis: data.synopsis || "",
+    concept: data.concept || "",
+    summary: data.summary || "",
     visual: {
-      tone: Array.isArray(data.visual_audio.visual.tone)
-        ? data.visual_audio.visual.tone.join(", ")
-        : data.visual_audio.visual.tone || "",
-      palette: data.visual_audio.visual.palette || "",
-      keyFX: data.visual_audio.visual.keyFX || "",
-      lighting: data.visual_audio.visual.lighting || "",
+      style: data.visualStyle.style || "",
+      palette: data.visualStyle.palette || "",
+      lighting: data.visualStyle.lighting || "",
+      cameraStyle: data.visualStyle.cameraStyle || "",
     },
     aural: {
-      bgm: data.visual_audio.aural.bgm || "",
-      sfx: data.visual_audio.aural.sfx || "",
-      ambience: data.visual_audio.aural.ambience || "",
+      bgm: data.audioDesign.bgm || "",
+      sfx: data.audioDesign.sfx || "",
+      ambience: data.audioDesign.ambience || "",
+      dialogue: data.audioDesign.dialogue || "",
+      voiceover: data.audioDesign.voiceover || "",
     },
-    spatial: {
-      main: data.spatial_layout.main || "",
-      foreground: data.spatial_layout.foreground || "",
-      midground: data.spatial_layout.midground || "",
-      background: data.spatial_layout.background || "",
+    characters: data.characters.map((character) => ({
+      name: character.name || "",
+      description: character.description || "",
+      performanceNote: character.performanceNote || "",
+    })),
+    setting: {
+      location: data.setting.location || "",
+      timeOfDay: data.setting.timeOfDay || "",
+      weather: data.setting.weather || "",
+      backgroundElements: data.setting.backgroundElements || "",
     },
     time_axis: data.time_axis.map((segment) => ({
       action: segment.action,
@@ -44,23 +50,31 @@ export const generateYaml = async (data: FormData): Promise<string> => {
     retryCount = 0
   ): Promise<{
     title?: string;
-    synopsis?: string;
+    concept?: string;
+    summary?: string;
     visual?: {
-      tone?: string;
+      style?: string;
       palette?: string;
-      keyFX?: string;
       lighting?: string;
+      cameraStyle?: string;
     };
     aural?: {
       bgm?: string;
       sfx?: string;
       ambience?: string;
+      dialogue?: string;
+      voiceover?: string;
     };
-    spatial?: {
-      main?: string;
-      foreground?: string;
-      midground?: string;
-      background?: string;
+    characters?: Array<{
+      name?: string;
+      description?: string;
+      performanceNote?: string;
+    }>;
+    setting?: {
+      location?: string;
+      timeOfDay?: string;
+      weather?: string;
+      backgroundElements?: string;
     };
     time_axis?: Array<{action?: string; camera?: string}>;
   }> => {
@@ -116,41 +130,58 @@ export const generateYaml = async (data: FormData): Promise<string> => {
   try {
     const translatedData = await attemptTranslation();
 
+    // デバッグ用：翻訳データをログ出力
+    console.log("Translated data:", translatedData);
+    console.log("Original data:", data);
+
     // 翻訳されたデータからYAMLを生成
     const yaml = `title: "${translatedData.title || data.title || ""}"
 
-synopsis: >
-${translatedData.synopsis || data.synopsis || ""}
+concept: "${translatedData.concept || data.concept || ""}"
 
-visual_audio: |
-Visual —
-tone: ${
-      Array.isArray(data.visual_audio.visual.tone)
-        ? data.visual_audio.visual.tone.join(", ")
-        : data.visual_audio.visual.tone || ""
-    }; palette: ${
-      translatedData.visual?.palette || data.visual_audio.visual.palette || ""
-    }
-key FX: ${translatedData.visual?.keyFX || data.visual_audio.visual.keyFX || ""}
-lighting: ${
-      translatedData.visual?.lighting || data.visual_audio.visual.lighting || ""
-    }
-Aural —
-BGM: ${translatedData.aural?.bgm || data.visual_audio.aural.bgm || ""}
-SFX: ${translatedData.aural?.sfx || data.visual_audio.aural.sfx || ""}
-ambience: ${
-      translatedData.aural?.ambience || data.visual_audio.aural.ambience || ""
+summary: >
+${translatedData.summary || data.summary || ""}
+
+visual_style: |
+Style: ${translatedData.visual?.style || data.visualStyle.style || ""}
+Palette: ${translatedData.visual?.palette || data.visualStyle.palette || ""}
+Lighting: ${translatedData.visual?.lighting || data.visualStyle.lighting || ""}
+Camera Style: ${
+      translatedData.visual?.cameraStyle || data.visualStyle.cameraStyle || ""
     }
 
-spatial_layout:
-main: >
-${translatedData.spatial?.main || data.spatial_layout.main || ""}
-foreground:
-${translatedData.spatial?.foreground || data.spatial_layout.foreground || ""}
-midground:
-${translatedData.spatial?.midground || data.spatial_layout.midground || ""}
-background:
-${translatedData.spatial?.background || data.spatial_layout.background || ""}
+audio_design: |
+BGM: ${translatedData.aural?.bgm || data.audioDesign.bgm || ""}
+SFX: ${translatedData.aural?.sfx || data.audioDesign.sfx || ""}
+Ambience: ${translatedData.aural?.ambience || data.audioDesign.ambience || ""}
+Dialogue: ${translatedData.aural?.dialogue || data.audioDesign.dialogue || ""}
+Voiceover: ${
+      translatedData.aural?.voiceover || data.audioDesign.voiceover || ""
+    }
+
+characters:
+${data.characters
+  .map((character, index) => {
+    const translatedChar = translatedData.characters?.[index];
+    return `- name: "${translatedChar?.name || character.name || ""}"
+  description: "${translatedChar?.description || character.description || ""}"
+  performanceNote: "${
+    translatedChar?.performanceNote || character.performanceNote || ""
+  }"`;
+  })
+  .join("\n")}
+
+setting:
+location: "${translatedData.setting?.location || data.setting.location || ""}"
+timeOfDay: "${
+      translatedData.setting?.timeOfDay || data.setting.timeOfDay || ""
+    }"
+weather: "${translatedData.setting?.weather || data.setting.weather || ""}"
+backgroundElements: "${
+      translatedData.setting?.backgroundElements ||
+      data.setting.backgroundElements ||
+      ""
+    }"
 
 time_axis:
 ${data.time_axis
@@ -169,32 +200,38 @@ ${data.time_axis
     // 翻訳に失敗した場合は元のコンテンツでYAMLを生成
     return `title: "${data.title || "YAML Arcane — Shadow Onmyoji"}"
 
-synopsis: >
-${data.synopsis || ""}
+concept: "${data.concept || ""}"
 
-visual_audio: |
-Visual —
-tone: ${
-      Array.isArray(data.visual_audio.visual.tone)
-        ? data.visual_audio.visual.tone.join(", ")
-        : data.visual_audio.visual.tone || ""
-    }; palette: ${data.visual_audio.visual.palette || ""}
-key FX: ${data.visual_audio.visual.keyFX || ""}
-lighting: ${data.visual_audio.visual.lighting || ""}
-Aural —
-BGM: ${data.visual_audio.aural.bgm || ""}
-SFX: ${data.visual_audio.aural.sfx || ""}
-ambience: ${data.visual_audio.aural.ambience || ""}
+summary: >
+${data.summary || ""}
 
-spatial_layout:
-main: >
-${data.spatial_layout.main || ""}
-foreground:
-${data.spatial_layout.foreground || ""}
-midground:
-${data.spatial_layout.midground || ""}
-background:
-${data.spatial_layout.background || ""}
+visual_style: |
+Style: ${data.visualStyle.style || ""}
+Palette: ${data.visualStyle.palette || ""}
+Lighting: ${data.visualStyle.lighting || ""}
+Camera Style: ${data.visualStyle.cameraStyle || ""}
+
+audio_design: |
+BGM: ${data.audioDesign.bgm || ""}
+SFX: ${data.audioDesign.sfx || ""}
+Ambience: ${data.audioDesign.ambience || ""}
+Dialogue: ${data.audioDesign.dialogue || ""}
+Voiceover: ${data.audioDesign.voiceover || ""}
+
+characters:
+${data.characters
+  .map(
+    (character) => `- name: "${character.name || ""}"
+  description: "${character.description || ""}"
+  performanceNote: "${character.performanceNote || ""}"`
+  )
+  .join("\n")}
+
+setting:
+location: "${data.setting.location || ""}"
+timeOfDay: "${data.setting.timeOfDay || ""}"
+weather: "${data.setting.weather || ""}"
+backgroundElements: "${data.setting.backgroundElements || ""}"
 
 time_axis:
 ${formatTimeAxis(data.time_axis)}`;

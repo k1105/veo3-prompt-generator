@@ -7,10 +7,15 @@ import {
   OutputFormat,
   Scene,
   ReferenceInfo,
+  Character,
+  VisualStyle,
+  AudioDesign,
 } from "../types";
 import BasicInfoSection from "./BasicInfoSection";
-import VisualAudioSection from "./VisualAudioSection";
-import SpatialLayoutSection from "./SpatialLayoutSection";
+import CharactersSection from "./CharactersSection";
+import SettingSection from "./SettingSection";
+import VisualStyleSection from "./VisualStyleSection";
+import AudioDesignSection from "./AudioDesignSection";
 import TimeAxisSection from "./TimeAxisSection";
 import OutputFormatSelector from "./OutputFormatSelector";
 
@@ -28,12 +33,8 @@ interface PromptFormProps {
     field: string,
     value: string
   ) => void;
-  onNestedInputChange: (
-    section: "visual_audio",
-    subsection: "visual" | "aural",
-    field: string,
-    value: string | string[]
-  ) => void;
+  onVisualStyleChange: (field: keyof VisualStyle, value: string) => void;
+  onAudioDesignChange: (field: keyof AudioDesign, value: string) => void;
   onTimeAxisChange: (segments: TimeSegment[]) => void;
   onSegmentSelect: (segment: TimeSegment | null) => void;
   onSegmentActionChange: (action: string) => void;
@@ -42,6 +43,7 @@ interface PromptFormProps {
   onTimeDecrement: (field: "startTime" | "endTime") => void;
   onLockToggle: (section: string, field: string, subsection?: string) => void;
   onFieldUpdate: (field: string, direction?: string) => Promise<void>;
+  onCharactersChange: (characters: Character[]) => void;
   onOutputFormatChange: (format: OutputFormat) => void;
   onSubmit: (e: React.FormEvent) => void;
   onReference: (sourceSceneId: string, fieldPath: string) => void;
@@ -59,7 +61,8 @@ const PromptForm: React.FC<PromptFormProps> = ({
   scenes,
   activeSceneId,
   onInputChange,
-  onNestedInputChange,
+  onVisualStyleChange,
+  onAudioDesignChange,
   onTimeAxisChange,
   onSegmentSelect,
   onSegmentActionChange,
@@ -68,6 +71,7 @@ const PromptForm: React.FC<PromptFormProps> = ({
   onTimeDecrement,
   onLockToggle,
   onFieldUpdate,
+  onCharactersChange,
   onOutputFormatChange,
   onSubmit,
   onReference,
@@ -78,36 +82,42 @@ const PromptForm: React.FC<PromptFormProps> = ({
     <form onSubmit={onSubmit} className={styles.form}>
       <BasicInfoSection
         title={formData.title}
-        synopsis={formData.synopsis}
+        concept={formData.concept}
+        summary={formData.summary}
         onTitleChange={(value) => onInputChange("title", "title", value)}
-        onSynopsisChange={(value) =>
-          onInputChange("synopsis", "synopsis", value)
-        }
+        onConceptChange={(value) => onInputChange("concept", "concept", value)}
+        onSummaryChange={(value) => onInputChange("summary", "summary", value)}
         titleLocked={lockState.title}
-        synopsisLocked={lockState.synopsis}
+        conceptLocked={lockState.concept}
+        summaryLocked={lockState.summary}
         onTitleLockToggle={() => onLockToggle("title", "title")}
-        onSynopsisLockToggle={() => onLockToggle("synopsis", "synopsis")}
+        onConceptLockToggle={() => onLockToggle("concept", "concept")}
+        onSummaryLockToggle={() => onLockToggle("summary", "summary")}
         onTitleUpdate={(direction) => onFieldUpdate("title", direction)}
-        onSynopsisUpdate={(direction) => onFieldUpdate("synopsis", direction)}
+        onConceptUpdate={(direction) => onFieldUpdate("concept", direction)}
+        onSummaryUpdate={(direction) => onFieldUpdate("summary", direction)}
       />
 
-      <VisualAudioSection
-        visualAudio={formData.visual_audio}
-        onVisualChange={(field, value) =>
-          onNestedInputChange("visual_audio", "visual", field, value)
-        }
-        onAuralChange={(field, value) =>
-          onNestedInputChange("visual_audio", "aural", field, value)
-        }
-        lockState={lockState.visual_audio}
-        onLockToggle={(subsection, field) =>
-          onLockToggle("visual_audio", field, subsection)
-        }
-        onVisualUpdate={(field, direction) =>
-          onFieldUpdate(`visual.${field}`, direction)
-        }
-        onAuralUpdate={(field, direction) =>
-          onFieldUpdate(`aural.${field}`, direction)
+      <CharactersSection
+        characters={formData.characters}
+        onChange={onCharactersChange}
+        lockState={lockState.characters}
+        onLockToggle={() => onLockToggle("characters", "characters")}
+        onUpdate={onFieldUpdate}
+        scenes={scenes}
+        activeSceneId={activeSceneId}
+        onReference={onReference}
+        getReferenceInfo={getReferenceInfo}
+        isFieldReferenced={isFieldReferenced}
+      />
+
+      <SettingSection
+        setting={formData.setting}
+        onChange={(field, value) => onInputChange("setting", field, value)}
+        lockState={lockState.setting}
+        onLockToggle={(field) => onLockToggle("setting", field)}
+        onUpdate={(field, direction) =>
+          onFieldUpdate(`setting.${field}`, direction)
         }
         scenes={scenes}
         activeSceneId={activeSceneId}
@@ -116,15 +126,28 @@ const PromptForm: React.FC<PromptFormProps> = ({
         isFieldReferenced={isFieldReferenced}
       />
 
-      <SpatialLayoutSection
-        spatialLayout={formData.spatial_layout}
-        onChange={(field, value) =>
-          onInputChange("spatial_layout", field, value)
-        }
-        lockState={lockState.spatial_layout}
-        onLockToggle={(field) => onLockToggle("spatial_layout", field)}
+      <VisualStyleSection
+        visualStyle={formData.visualStyle}
+        onChange={(field, value) => onVisualStyleChange(field, value)}
+        lockState={lockState.visualStyle}
+        onLockToggle={(field) => onLockToggle("visualStyle", field)}
         onUpdate={(field, direction) =>
-          onFieldUpdate(`spatial_layout.${field}`, direction)
+          onFieldUpdate(`visualStyle.${field}`, direction)
+        }
+        scenes={scenes}
+        activeSceneId={activeSceneId}
+        onReference={onReference}
+        getReferenceInfo={getReferenceInfo}
+        isFieldReferenced={isFieldReferenced}
+      />
+
+      <AudioDesignSection
+        audioDesign={formData.audioDesign}
+        onChange={(field, value) => onAudioDesignChange(field, value)}
+        lockState={lockState.audioDesign}
+        onLockToggle={(field) => onLockToggle("audioDesign", field)}
+        onUpdate={(field, direction) =>
+          onFieldUpdate(`audioDesign.${field}`, direction)
         }
         scenes={scenes}
         activeSceneId={activeSceneId}
@@ -151,10 +174,13 @@ const PromptForm: React.FC<PromptFormProps> = ({
         onSegmentCameraUpdate={(direction) =>
           onFieldUpdate("segmentCamera", direction)
         }
-        visualAudio={formData.visual_audio}
-        spatialLayout={formData.spatial_layout}
+        visualStyle={formData.visualStyle}
+        audioDesign={formData.audioDesign}
+        setting={formData.setting}
+        characters={formData.characters}
         title={formData.title}
-        synopsis={formData.synopsis}
+        concept={formData.concept}
+        summary={formData.summary}
         apiKey={apiKey}
         scenes={scenes}
         activeSceneId={activeSceneId}

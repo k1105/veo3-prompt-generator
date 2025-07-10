@@ -72,13 +72,68 @@ function cleanAndParseJSON(jsonText: string) {
       return parsed;
     } catch (secondError) {
       console.error("Second parse attempt failed:", secondError);
-      throw new Error(
-        `JSON parsing failed: ${
-          secondError instanceof Error ? secondError.message : "Unknown error"
-        }`
-      );
+
+      // 最後の手段：不完全なJSONを修復
+      try {
+        const repaired = repairIncompleteJSON(safer);
+        const parsed = JSON.parse(repaired);
+        console.log("Successfully parsed JSON with repair");
+        return parsed;
+      } catch (repairError) {
+        console.error("JSON repair failed:", repairError);
+        throw new Error(
+          `JSON parsing failed: ${
+            secondError instanceof Error ? secondError.message : "Unknown error"
+          }`
+        );
+      }
     }
   }
+}
+
+function repairIncompleteJSON(jsonText: string): string {
+  console.log("Attempting to repair incomplete JSON");
+
+  // time_axis配列の不完全な要素を修復
+  const timeAxisMatch = jsonText.match(/"time_axis":\s*\[([^\]]*)$/);
+  if (timeAxisMatch) {
+    const incompleteTimeAxis = timeAxisMatch[1];
+    console.log("Incomplete time_axis:", incompleteTimeAxis);
+
+    // 不完全なtime_axis要素を修復
+    let repairedTimeAxis = incompleteTimeAxis;
+
+    // 最後の要素が不完全な場合、基本的な構造で補完
+    if (
+      repairedTimeAxis.includes('"id"') &&
+      !repairedTimeAxis.includes('"camera"')
+    ) {
+      repairedTimeAxis = repairedTimeAxis.replace(
+        /("action":\s*"[^"]*)$/,
+        '$1", "camera": "修復されたカメラワーク"}'
+      );
+    }
+
+    // 配列を閉じる
+    jsonText = jsonText.replace(
+      /"time_axis":\s*\[([^\]]*)$/,
+      `"time_axis": [${repairedTimeAxis}]`
+    );
+  }
+
+  // 不完全なオブジェクトの修復
+  if (jsonText.includes("{") && !jsonText.endsWith("}")) {
+    // 最後の不完全なオブジェクトを閉じる
+    jsonText = jsonText.replace(/([^}])$/, "$1}");
+  }
+
+  // 不完全な配列の修復
+  if (jsonText.includes("[") && !jsonText.includes("]")) {
+    jsonText = jsonText.replace(/([^\]]*)$/, "$1]");
+  }
+
+  console.log("Repaired JSON:", jsonText);
+  return jsonText;
 }
 
 export async function POST(request: NextRequest) {

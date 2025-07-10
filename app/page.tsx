@@ -29,7 +29,8 @@ export default function Home() {
     setOutputFormat,
     setApiKey,
     handleInputChange,
-    handleNestedInputChange,
+    handleVisualStyleChange,
+    handleAudioDesignChange,
     handleTimeAxisChange,
     handleSegmentSelect,
     handleSegmentActionChange,
@@ -41,6 +42,7 @@ export default function Home() {
     handleGeneratedData,
     handleLockToggle,
     handleFieldUpdate,
+    handleCharactersChange,
     handleReference,
     getReferenceInfo,
     isFieldReferenced,
@@ -68,7 +70,8 @@ export default function Home() {
           scenes={scenes}
           activeSceneId={activeSceneId}
           onInputChange={handleInputChange}
-          onNestedInputChange={handleNestedInputChange}
+          onVisualStyleChange={handleVisualStyleChange}
+          onAudioDesignChange={handleAudioDesignChange}
           onTimeAxisChange={handleTimeAxisChange}
           onSegmentSelect={handleSegmentSelect}
           onSegmentActionChange={handleSegmentActionChange}
@@ -77,6 +80,7 @@ export default function Home() {
           onTimeDecrement={handleTimeDecrement}
           onLockToggle={handleLockToggle}
           onFieldUpdate={handleFieldUpdate}
+          onCharactersChange={handleCharactersChange}
           onOutputFormatChange={setOutputFormat}
           onSubmit={handleSubmit}
           onReference={handleReference}

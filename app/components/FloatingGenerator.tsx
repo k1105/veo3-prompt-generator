@@ -3,11 +3,12 @@
 import {useState} from "react";
 import styles from "../page.module.css";
 import {FormData, LockState, TONE_OPTIONS} from "../types";
+import ChatInterface from "./ChatInterface";
 
 type FloatingGeneratorProps = {
   formData: FormData;
   lockState: LockState;
-  onGenerate: (data: Partial<FormData>) => void;
+  onGenerate: (data: FormData) => void;
   apiKey?: string;
 };
 
@@ -21,26 +22,28 @@ export default function FloatingGenerator({
   const [error, setError] = useState<string | null>(null);
   const [showInstructions, setShowInstructions] = useState(false);
   const [instructions, setInstructions] = useState("");
-  const [showPromptModal, setShowPromptModal] = useState(false);
-  const [promptText, setPromptText] = useState("");
-  const [isConverting, setIsConverting] = useState(false);
+  const [isChatMinimized, setIsChatMinimized] = useState(false);
 
   const generateContent = async () => {
     // ロックされていない項目があるかチェック
     const hasUnlockedFields =
       !lockState.title ||
-      !lockState.synopsis ||
-      !lockState.visual_audio.visual.tone ||
-      !lockState.visual_audio.visual.palette ||
-      !lockState.visual_audio.visual.keyFX ||
-      !lockState.visual_audio.visual.lighting ||
-      !lockState.visual_audio.aural.bgm ||
-      !lockState.visual_audio.aural.sfx ||
-      !lockState.visual_audio.aural.ambience ||
-      !lockState.spatial_layout.main ||
-      !lockState.spatial_layout.foreground ||
-      !lockState.spatial_layout.midground ||
-      !lockState.spatial_layout.background ||
+      !lockState.concept ||
+      !lockState.summary ||
+      !lockState.visualStyle.style ||
+      !lockState.visualStyle.palette ||
+      !lockState.visualStyle.lighting ||
+      !lockState.visualStyle.cameraStyle ||
+      !lockState.audioDesign.bgm ||
+      !lockState.audioDesign.sfx ||
+      !lockState.audioDesign.ambience ||
+      !lockState.audioDesign.dialogue ||
+      !lockState.audioDesign.voiceover ||
+      !lockState.characters ||
+      !lockState.setting.location ||
+      !lockState.setting.timeOfDay ||
+      !lockState.setting.weather ||
+      !lockState.setting.backgroundElements ||
       !lockState.time_axis;
 
     if (!hasUnlockedFields) {
@@ -57,46 +60,46 @@ export default function FloatingGenerator({
       // ロックされた項目の情報を収集
       const lockedInfo = {
         title: lockState.title ? formData.title : null,
-        synopsis: lockState.synopsis ? formData.synopsis : null,
-        visual_audio: {
-          visual: {
-            tone: lockState.visual_audio.visual.tone
-              ? formData.visual_audio.visual.tone
-              : null,
-            palette: lockState.visual_audio.visual.palette
-              ? formData.visual_audio.visual.palette
-              : null,
-            keyFX: lockState.visual_audio.visual.keyFX
-              ? formData.visual_audio.visual.keyFX
-              : null,
-            lighting: lockState.visual_audio.visual.lighting
-              ? formData.visual_audio.visual.lighting
-              : null,
-          },
-          aural: {
-            bgm: lockState.visual_audio.aural.bgm
-              ? formData.visual_audio.aural.bgm
-              : null,
-            sfx: lockState.visual_audio.aural.sfx
-              ? formData.visual_audio.aural.sfx
-              : null,
-            ambience: lockState.visual_audio.aural.ambience
-              ? formData.visual_audio.aural.ambience
-              : null,
-          },
+        concept: lockState.concept ? formData.concept : null,
+        summary: lockState.summary ? formData.summary : null,
+        visualStyle: {
+          style: lockState.visualStyle.style
+            ? formData.visualStyle.style
+            : null,
+          palette: lockState.visualStyle.palette
+            ? formData.visualStyle.palette
+            : null,
+          lighting: lockState.visualStyle.lighting
+            ? formData.visualStyle.lighting
+            : null,
+          cameraStyle: lockState.visualStyle.cameraStyle
+            ? formData.visualStyle.cameraStyle
+            : null,
         },
-        spatial_layout: {
-          main: lockState.spatial_layout.main
-            ? formData.spatial_layout.main
+        audioDesign: {
+          bgm: lockState.audioDesign.bgm ? formData.audioDesign.bgm : null,
+          sfx: lockState.audioDesign.sfx ? formData.audioDesign.sfx : null,
+          ambience: lockState.audioDesign.ambience
+            ? formData.audioDesign.ambience
             : null,
-          foreground: lockState.spatial_layout.foreground
-            ? formData.spatial_layout.foreground
+          dialogue: lockState.audioDesign.dialogue
+            ? formData.audioDesign.dialogue
             : null,
-          midground: lockState.spatial_layout.midground
-            ? formData.spatial_layout.midground
+          voiceover: lockState.audioDesign.voiceover
+            ? formData.audioDesign.voiceover
             : null,
-          background: lockState.spatial_layout.background
-            ? formData.spatial_layout.background
+        },
+        characters: lockState.characters ? formData.characters : null,
+        setting: {
+          location: lockState.setting.location
+            ? formData.setting.location
+            : null,
+          timeOfDay: lockState.setting.timeOfDay
+            ? formData.setting.timeOfDay
+            : null,
+          weather: lockState.setting.weather ? formData.setting.weather : null,
+          backgroundElements: lockState.setting.backgroundElements
+            ? formData.setting.backgroundElements
             : null,
         },
         time_axis: lockState.time_axis ? formData.time_axis : null,
@@ -111,47 +114,53 @@ export default function FloatingGenerator({
 
 現在の設定：
 タイトル: ${lockedInfo.title || "未設定"}
-シノプシス: ${lockedInfo.synopsis || "未設定"}
+コンセプト: ${lockedInfo.concept || "未設定"}
+サマリー: ${lockedInfo.summary || "未設定"}
 
-視覚・音響: ${lockedInfo.visual_audio.visual.tone ? "設定済み" : "未設定"}
-空間レイアウト: ${lockedInfo.spatial_layout.main ? "設定済み" : "未設定"}
+視覚スタイル: ${lockedInfo.visualStyle.style ? "設定済み" : "未設定"}
+音響デザイン: ${lockedInfo.audioDesign.bgm ? "設定済み" : "未設定"}
+キャラクター: ${lockedInfo.characters ? "設定済み" : "未設定"}
+設定: ${lockedInfo.setting.location ? "設定済み" : "未設定"}
 タイムライン: ${lockedInfo.time_axis ? "設定済み" : "未設定"}
 
 以下のJSON形式で回答してください：
 
 {
   "title": "${lockedInfo.title || "生成されたタイトル"}",
-  "synopsis": "${lockedInfo.synopsis || "生成されたシノプシス"}",
-  "visual_audio": {
-    "visual": {
-      "tone": ${
-        lockedInfo.visual_audio.visual.tone
-          ? JSON.stringify(lockedInfo.visual_audio.visual.tone)
-          : '["cinematic film of", "anime style"]'
-      },
-      "palette": "${
-        lockedInfo.visual_audio.visual.palette || "生成されたパレット"
-      }",
-      "keyFX": "${
-        lockedInfo.visual_audio.visual.keyFX || "生成された主要効果"
-      }",
-      "lighting": "${
-        lockedInfo.visual_audio.visual.lighting || "生成された照明"
-      }"
-    },
-    "aural": {
-      "bgm": "${lockedInfo.visual_audio.aural.bgm || "生成されたBGM"}",
-      "sfx": "${lockedInfo.visual_audio.aural.sfx || "生成された効果音"}",
-      "ambience": "${
-        lockedInfo.visual_audio.aural.ambience || "生成された環境音"
-      }"
-    }
+  "concept": "${lockedInfo.concept || "生成されたコンセプト"}",
+  "summary": "${lockedInfo.summary || "生成されたサマリー"}",
+  "visualStyle": {
+    "style": "${lockedInfo.visualStyle.style || "生成されたスタイル"}",
+    "palette": "${lockedInfo.visualStyle.palette || "生成されたパレット"}",
+    "lighting": "${lockedInfo.visualStyle.lighting || "生成された照明"}",
+    "cameraStyle": "${
+      lockedInfo.visualStyle.cameraStyle || "生成されたカメラスタイル"
+    }"
   },
-  "spatial_layout": {
-    "main": "${lockedInfo.spatial_layout.main || "生成されたメイン被写体"}",
-    "foreground": "${lockedInfo.spatial_layout.foreground || "生成された前景"}",
-    "midground": "${lockedInfo.spatial_layout.midground || "生成された中景"}",
-    "background": "${lockedInfo.spatial_layout.background || "生成された背景"}"
+  "audioDesign": {
+    "bgm": "${lockedInfo.audioDesign.bgm || "生成されたBGM"}",
+    "sfx": "${lockedInfo.audioDesign.sfx || "生成された効果音"}",
+    "ambience": "${lockedInfo.audioDesign.ambience || "生成された環境音"}",
+    "dialogue": "${lockedInfo.audioDesign.dialogue || "生成された対話"}",
+    "voiceover": "${
+      lockedInfo.audioDesign.voiceover || "生成されたナレーション"
+    }"
+  },
+  "characters": ${
+    lockedInfo.characters
+      ? JSON.stringify(lockedInfo.characters)
+      : `[
+    {"name": "生成されたキャラクター1", "description": "生成された説明1", "performanceNote": "生成された演技ノート1"},
+    {"name": "生成されたキャラクター2", "description": "生成された説明2", "performanceNote": "生成された演技ノート2"}
+  ]`
+  },
+  "setting": {
+    "location": "${lockedInfo.setting.location || "生成された場所"}",
+    "timeOfDay": "${lockedInfo.setting.timeOfDay || "生成された時間帯"}",
+    "weather": "${lockedInfo.setting.weather || "生成された天気"}",
+    "backgroundElements": "${
+      lockedInfo.setting.backgroundElements || "生成された背景要素"
+    }"
   },
   "time_axis": ${
     lockedInfo.time_axis
@@ -193,14 +202,10 @@ export default function FloatingGenerator({
       console.log("Generated data:", data);
       console.log("Lock state:", lockState);
 
-      // toneフィールドの検証とフィルタリング
-      if (
-        data.visual_audio &&
-        data.visual_audio.visual &&
-        data.visual_audio.visual.tone
-      ) {
+      // moodToneフィールドの検証とフィルタリング
+      if (data.visualStyle && data.visualStyle.moodTone) {
         const validToneValues = TONE_OPTIONS.map((option) => option.value);
-        const originalTone = data.visual_audio.visual.tone;
+        const originalTone = data.visualStyle.moodTone;
 
         // 配列でない場合は配列に変換
         const toneArray = Array.isArray(originalTone)
@@ -213,7 +218,7 @@ export default function FloatingGenerator({
         );
 
         // フィルタリングされたデータで更新
-        data.visual_audio.visual.tone = filteredTone;
+        data.visualStyle.moodTone = filteredTone;
 
         // 無効な値があった場合はコンソールに警告
         if (filteredTone.length !== toneArray.length) {
@@ -231,81 +236,6 @@ export default function FloatingGenerator({
       );
     } finally {
       setIsGenerating(false);
-    }
-  };
-
-  const convertPrompt = async () => {
-    if (!promptText.trim()) {
-      setError("プロンプトを入力してください");
-      return;
-    }
-
-    setIsConverting(true);
-    setError(null);
-
-    try {
-      const response = await fetch("/api/convert-prompt", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          prompt: promptText,
-          customApiKey: apiKey,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error("プロンプト変換に失敗しました");
-      }
-
-      const data = await response.json();
-
-      // デバッグ用：変換されたデータをコンソールに出力
-      console.log("Converted data:", data);
-
-      // toneフィールドの検証とフィルタリング
-      if (
-        data.visual_audio &&
-        data.visual_audio.visual &&
-        data.visual_audio.visual.tone
-      ) {
-        const validToneValues = TONE_OPTIONS.map((option) => option.value);
-        const originalTone = data.visual_audio.visual.tone;
-
-        // 配列でない場合は配列に変換
-        const toneArray = Array.isArray(originalTone)
-          ? originalTone
-          : [originalTone];
-
-        // 有効な値のみをフィルタリング
-        const filteredTone = toneArray.filter((tone) =>
-          validToneValues.includes(tone)
-        );
-
-        // フィルタリングされたデータで更新
-        data.visual_audio.visual.tone = filteredTone;
-
-        // 無効な値があった場合はコンソールに警告
-        if (filteredTone.length !== toneArray.length) {
-          console.warn(
-            "Invalid tone values filtered out:",
-            toneArray.filter((tone) => !validToneValues.includes(tone))
-          );
-        }
-      }
-
-      onGenerate(data);
-      setShowPromptModal(false);
-      setPromptText("");
-    } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "プロンプト変換中にエラーが発生しました"
-      );
-    } finally {
-      setIsConverting(false);
     }
   };
 
@@ -341,10 +271,10 @@ export default function FloatingGenerator({
         )}
         <button
           type="button"
-          onClick={() => setShowPromptModal(true)}
-          className={styles.convertPromptButton}
+          onClick={() => setIsChatMinimized(!isChatMinimized)}
+          className={styles.chatToggleButton}
         >
-          プロンプト変換
+          {isChatMinimized ? "💬" : "_"}
         </button>
         <button
           type="button"
@@ -364,45 +294,43 @@ export default function FloatingGenerator({
         {error && <div className={styles.error}>{error}</div>}
       </div>
 
-      {/* プロンプト変換モーダル */}
-      {showPromptModal && (
-        <div className={styles.promptModal}>
-          <div className={styles.promptModalContent}>
-            <div className={styles.promptModalHeader}>
-              <h3>プロンプト変換</h3>
-              <button
-                type="button"
-                onClick={() => setShowPromptModal(false)}
-                className={styles.promptModalClose}
-              >
-                ×
-              </button>
-            </div>
-            <textarea
-              value={promptText}
-              onChange={(e) => setPromptText(e.target.value)}
-              placeholder="既存のプロンプトをここに貼り付けてください..."
-              className={styles.promptModalTextarea}
-            />
-            <div className={styles.promptModalButtons}>
-              <button
-                type="button"
-                onClick={() => setShowPromptModal(false)}
-                className={styles.promptModalCancel}
-              >
-                キャンセル
-              </button>
-              <button
-                type="button"
-                onClick={convertPrompt}
-                disabled={isConverting}
-                className={styles.promptModalConvert}
-              >
-                {isConverting ? "変換中..." : "変換"}
-              </button>
-            </div>
-          </div>
-        </div>
+      {/* チャットインターフェース */}
+      {!isChatMinimized && (
+        <ChatInterface
+          formData={formData}
+          onUpdateFormData={(updater: (prev: FormData) => FormData) => {
+            const updatedData = updater(formData);
+            onGenerate(updatedData);
+          }}
+          apiKey={apiKey}
+          onMinimize={() => setIsChatMinimized(true)}
+          onGenerateContent={generateContent}
+          onTranslate={async (content: string, type: string) => {
+            try {
+              const response = await fetch("/api/translate", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  content,
+                  type,
+                  customApiKey: apiKey,
+                }),
+              });
+              if (response.ok) {
+                const data = await response.json();
+                onGenerate(data);
+              }
+            } catch (error) {
+              console.error("Translation error:", error);
+            }
+          }}
+          onGenerateImage={async (segmentId: string) => {
+            // 画像生成機能は現在のセグメントに対して実行
+            console.log("Generate image for segment:", segmentId);
+          }}
+        />
       )}
     </>
   );
