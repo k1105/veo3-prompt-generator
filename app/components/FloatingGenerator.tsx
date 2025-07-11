@@ -2,7 +2,7 @@
 
 import {useState} from "react";
 import styles from "../page.module.css";
-import {FormData, LockState, TONE_OPTIONS} from "../types";
+import {FormData, LockState} from "../types";
 import ChatInterface from "./ChatInterface";
 
 type FloatingGeneratorProps = {
@@ -33,7 +33,6 @@ export default function FloatingGenerator({
       !lockState.visualStyle.style ||
       !lockState.visualStyle.palette ||
       !lockState.visualStyle.lighting ||
-      !lockState.visualStyle.cameraStyle ||
       !lockState.audioDesign.bgm ||
       !lockState.audioDesign.sfx ||
       !lockState.audioDesign.ambience ||
@@ -71,9 +70,6 @@ export default function FloatingGenerator({
             : null,
           lighting: lockState.visualStyle.lighting
             ? formData.visualStyle.lighting
-            : null,
-          cameraStyle: lockState.visualStyle.cameraStyle
-            ? formData.visualStyle.cameraStyle
             : null,
         },
         audioDesign: {
@@ -133,9 +129,6 @@ export default function FloatingGenerator({
     "style": "${lockedInfo.visualStyle.style || "生成されたスタイル"}",
     "palette": "${lockedInfo.visualStyle.palette || "生成されたパレット"}",
     "lighting": "${lockedInfo.visualStyle.lighting || "生成された照明"}",
-    "cameraStyle": "${
-      lockedInfo.visualStyle.cameraStyle || "生成されたカメラスタイル"
-    }"
   },
   "audioDesign": {
     "bgm": "${lockedInfo.audioDesign.bgm || "生成されたBGM"}",
@@ -150,8 +143,8 @@ export default function FloatingGenerator({
     lockedInfo.characters
       ? JSON.stringify(lockedInfo.characters)
       : `[
-    {"name": "生成されたキャラクター1", "description": "生成された説明1", "performanceNote": "生成された演技ノート1"},
-    {"name": "生成されたキャラクター2", "description": "生成された説明2", "performanceNote": "生成された演技ノート2"}
+    {"name": "生成されたキャラクター1", "description": "生成された説明1"},
+    {"name": "生成されたキャラクター2", "description": "生成された説明2"}
   ]`
   },
   "setting": {
@@ -201,33 +194,6 @@ export default function FloatingGenerator({
       // デバッグ用：生成されたデータをコンソールに出力
       console.log("Generated data:", data);
       console.log("Lock state:", lockState);
-
-      // moodToneフィールドの検証とフィルタリング
-      if (data.visualStyle && data.visualStyle.moodTone) {
-        const validToneValues = TONE_OPTIONS.map((option) => option.value);
-        const originalTone = data.visualStyle.moodTone;
-
-        // 配列でない場合は配列に変換
-        const toneArray = Array.isArray(originalTone)
-          ? originalTone
-          : [originalTone];
-
-        // 有効な値のみをフィルタリング
-        const filteredTone = toneArray.filter((tone) =>
-          validToneValues.includes(tone)
-        );
-
-        // フィルタリングされたデータで更新
-        data.visualStyle.moodTone = filteredTone;
-
-        // 無効な値があった場合はコンソールに警告
-        if (filteredTone.length !== toneArray.length) {
-          console.warn(
-            "Invalid tone values filtered out:",
-            toneArray.filter((tone) => !validToneValues.includes(tone))
-          );
-        }
-      }
 
       onGenerate(data);
     } catch (err) {

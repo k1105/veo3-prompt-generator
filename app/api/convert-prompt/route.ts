@@ -36,7 +36,6 @@ ${prompt}
 
     "palette": "色調・パレットの説明",
     "lighting": "照明の説明",
-    "cameraStyle": "カメラスタイルの説明"
   },
   "audioDesign": {
     "bgm": "BGMの説明",
@@ -49,7 +48,6 @@ ${prompt}
     {
       "name": "キャラクター名",
       "description": "キャラクターの説明",
-      "performanceNote": "演技ノート"
     }
   ],
   "setting": {

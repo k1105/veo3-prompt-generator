@@ -48,7 +48,6 @@ export default function CharactersSection({
     const newCharacter: Character = {
       name: "",
       description: "",
-      performanceNote: "",
     };
     onChange([...characters, newCharacter]);
   };
@@ -115,20 +114,6 @@ export default function CharactersSection({
             locked={lockState}
             onUpdate={onUpdate}
             fieldKey={`characters.${index}.description`}
-          />
-          <FormField
-            id={`character-${index}-performanceNote`}
-            label="Performance Note"
-            value={character.performanceNote}
-            onChange={(value) =>
-              handleCharacterChange(index, "performanceNote", value as string)
-            }
-            placeholder="Movement, expression, or performance details"
-            type="textarea"
-            rows={2}
-            locked={lockState}
-            onUpdate={onUpdate}
-            fieldKey={`characters.${index}.performanceNote`}
           />
         </div>
       ))}

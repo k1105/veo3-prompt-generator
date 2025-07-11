@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
      - title: タイトル（文字列）
      - concept: コンセプト（文字列）
      - summary: サマリー（文字列）
-     - visualStyle: { style, palette, lighting, cameraStyle }
+     - visualStyle: { style, palette, lighting }
      - audioDesign: { bgm, sfx, ambience, dialogue, voiceover }
      - characters: キャラクター配列
      - setting: { location, timeOfDay, weather, backgroundElements }
@@ -108,7 +108,7 @@ export async function POST(request: NextRequest) {
 \`\`\`
 
 **正しいJSON形式の例：**
-- characters: [{"name": "キャラクター名", "description": "説明", "performanceNote": "演技ノート"}] （配列形式）
+- characters: [{"name": "キャラクター名", "description": "説明",
 - time_axis: [{"id": "1", "startTime": 0.0, "endTime": 2.0, "action": "アクション", "camera": "カメラワーク"}] （配列形式）
 
 **重要な制限事項：**

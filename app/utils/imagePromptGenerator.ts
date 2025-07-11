@@ -17,7 +17,7 @@ export function generateImagePrompt(
   summary: string
 ): string {
   const {action} = segment;
-  const {style, palette, lighting, cameraStyle} = visualStyle;
+  const {style, palette, lighting} = visualStyle;
   const {location, timeOfDay, weather, backgroundElements} = setting;
 
   // 画像生成用のプロンプト（直接的な画像生成指示）
@@ -49,9 +49,6 @@ export function generateImagePrompt(
   }
   if (palette) {
     prompt += `Color palette: ${palette}. `;
-  }
-  if (cameraStyle) {
-    prompt += `Camera style: ${cameraStyle}. `;
   }
   if (lighting) {
     prompt += `Lighting: ${lighting}. `;

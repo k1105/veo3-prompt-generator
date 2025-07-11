@@ -12,7 +12,6 @@ type VisualStyleSectionProps = {
     style: boolean;
     palette: boolean;
     lighting: boolean;
-    cameraStyle: boolean;
   };
   onLockToggle?: (field: string) => void;
   onUpdate?: (field: string, direction?: string) => Promise<void>;
@@ -86,19 +85,6 @@ export default function VisualStyleSection({
         onLockToggle={onLockToggle ? () => onLockToggle("lighting") : undefined}
         onUpdate={onUpdate}
         fieldKey="visualStyle.lighting"
-      />
-      <FormField
-        id="cameraStyle"
-        label="Camera Style"
-        value={visualStyle.cameraStyle}
-        onChange={(value) => handleChange("cameraStyle", value)}
-        placeholder="e.g., handheld, steady, dynamic movement"
-        locked={lockState?.cameraStyle}
-        onLockToggle={
-          onLockToggle ? () => onLockToggle("cameraStyle") : undefined
-        }
-        onUpdate={onUpdate}
-        fieldKey="visualStyle.cameraStyle"
       />
     </section>
   );

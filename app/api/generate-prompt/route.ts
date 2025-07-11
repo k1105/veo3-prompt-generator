@@ -84,7 +84,6 @@ const formatDataForGemini = (data: FormData): string => {
       style: data.visualStyle?.style || "",
       palette: data.visualStyle?.palette || "",
       lighting: data.visualStyle?.lighting || "",
-      cameraStyle: data.visualStyle?.cameraStyle || "",
     },
     audioDesign: {
       bgm: data.audioDesign?.bgm || "",
@@ -229,7 +228,6 @@ export async function POST(request: NextRequest) {
         palette: data.visualStyle?.palette || "",
         style: data.visualStyle?.style || "",
         lighting: data.visualStyle?.lighting || "",
-        cameraStyle: data.visualStyle?.cameraStyle || "",
       },
       aural: {
         bgm: data.audioDesign?.bgm || "",
@@ -318,10 +316,6 @@ export async function POST(request: NextRequest) {
           translatedData.visual?.palette || data.visualStyle?.palette || "",
         lighting:
           translatedData.visual?.lighting || data.visualStyle?.lighting || "",
-        cameraStyle:
-          translatedData.visual?.cameraStyle ||
-          data.visualStyle?.cameraStyle ||
-          "",
       },
       audioDesign: {
         ...data.audioDesign,

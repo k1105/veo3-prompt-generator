@@ -19,7 +19,6 @@ export const generateYaml = async (data: FormData): Promise<string> => {
       style: data.visualStyle.style || "",
       palette: data.visualStyle.palette || "",
       lighting: data.visualStyle.lighting || "",
-      cameraStyle: data.visualStyle.cameraStyle || "",
     },
     aural: {
       bgm: data.audioDesign.bgm || "",
@@ -31,7 +30,6 @@ export const generateYaml = async (data: FormData): Promise<string> => {
     characters: data.characters.map((character) => ({
       name: character.name || "",
       description: character.description || "",
-      performanceNote: character.performanceNote || "",
     })),
     setting: {
       location: data.setting.location || "",
@@ -56,7 +54,6 @@ export const generateYaml = async (data: FormData): Promise<string> => {
       style?: string;
       palette?: string;
       lighting?: string;
-      cameraStyle?: string;
     };
     aural?: {
       bgm?: string;
@@ -68,7 +65,6 @@ export const generateYaml = async (data: FormData): Promise<string> => {
     characters?: Array<{
       name?: string;
       description?: string;
-      performanceNote?: string;
     }>;
     setting?: {
       location?: string;
@@ -146,9 +142,6 @@ visual_style: |
 Style: ${translatedData.visual?.style || data.visualStyle.style || ""}
 Palette: ${translatedData.visual?.palette || data.visualStyle.palette || ""}
 Lighting: ${translatedData.visual?.lighting || data.visualStyle.lighting || ""}
-Camera Style: ${
-      translatedData.visual?.cameraStyle || data.visualStyle.cameraStyle || ""
-    }
 
 audio_design: |
 BGM: ${translatedData.aural?.bgm || data.audioDesign.bgm || ""}
@@ -165,9 +158,7 @@ ${data.characters
     const translatedChar = translatedData.characters?.[index];
     return `- name: "${translatedChar?.name || character.name || ""}"
   description: "${translatedChar?.description || character.description || ""}"
-  performanceNote: "${
-    translatedChar?.performanceNote || character.performanceNote || ""
-  }"`;
+  `;
   })
   .join("\n")}
 
@@ -209,7 +200,6 @@ visual_style: |
 Style: ${data.visualStyle.style || ""}
 Palette: ${data.visualStyle.palette || ""}
 Lighting: ${data.visualStyle.lighting || ""}
-Camera Style: ${data.visualStyle.cameraStyle || ""}
 
 audio_design: |
 BGM: ${data.audioDesign.bgm || ""}
@@ -222,8 +212,7 @@ characters:
 ${data.characters
   .map(
     (character) => `- name: "${character.name || ""}"
-  description: "${character.description || ""}"
-  performanceNote: "${character.performanceNote || ""}"`
+  description: "${character.description || ""}"`
   )
   .join("\n")}
 

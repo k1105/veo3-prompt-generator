@@ -30,7 +30,6 @@ export async function POST(request: NextRequest) {
 
       "visualStyle.palette": "映像のカラーパレット",
       "visualStyle.lighting": "ライティング",
-      "visualStyle.cameraStyle": "カメラスタイル・カメラワーク",
       "audioDesign.bgm": "背景音楽",
       "audioDesign.sfx": "効果音",
       "audioDesign.ambience": "環境音・アンビエンス",

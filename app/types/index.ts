@@ -185,7 +185,6 @@ export type VisualStyle = {
   style: string;
   palette: string;
   lighting: string;
-  cameraStyle: string;
 };
 
 export type VisualStyleField = {
@@ -203,7 +202,6 @@ export type AudioDesign = {
 export type Character = {
   name: string;
   description: string;
-  performanceNote: string;
 };
 
 export type Setting = {
@@ -240,7 +238,6 @@ export type LockState = {
     style: boolean;
     palette: boolean;
     lighting: boolean;
-    cameraStyle: boolean;
   };
   audioDesign: {
     bgm: boolean;

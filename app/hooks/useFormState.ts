@@ -29,7 +29,6 @@ const createDefaultScene = (id: string, name: string): Scene => ({
       style: "",
       palette: "",
       lighting: "",
-      cameraStyle: "",
     },
     audioDesign: {
       bgm: "",
@@ -55,7 +54,6 @@ const createDefaultScene = (id: string, name: string): Scene => ({
       style: false,
       palette: false,
       lighting: false,
-      cameraStyle: false,
     },
     audioDesign: {
       bgm: false,

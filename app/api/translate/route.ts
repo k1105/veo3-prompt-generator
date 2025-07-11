@@ -36,10 +36,8 @@ JSON形式で回答：
   "summary": "英語サマリー",
   "visual": {
     "style": "英語スタイル",
-    "moodTone": "英語ムード/トーン",
     "palette": "英語パレット",
     "lighting": "英語照明",
-    "cameraStyle": "英語カメラスタイル"
   },
   "aural": {
     "bgm": "英語BGM",
@@ -49,7 +47,7 @@ JSON形式で回答：
     "voiceover": "英語ナレーション"
   },
   "characters": [
-    {"name": "英語キャラクター名", "description": "英語キャラクター説明", "performanceNote": "英語演技ノート"}
+    {"name": "英語キャラクター名", "description": "英語キャラクター説明"}
   ],
   "setting": {
     "location": "英語場所",
