@@ -16,7 +16,6 @@ import CharactersSection from "./CharactersSection";
 import SettingSection from "./SettingSection";
 import VisualStyleSection from "./VisualStyleSection";
 import AudioDesignSection from "./AudioDesignSection";
-import TimeAxisSection from "./TimeAxisSection";
 import OutputFormatSelector from "./OutputFormatSelector";
 
 interface PromptFormProps {
@@ -96,6 +95,34 @@ const PromptForm: React.FC<PromptFormProps> = ({
         onTitleUpdate={(direction) => onFieldUpdate("title", direction)}
         onConceptUpdate={(direction) => onFieldUpdate("concept", direction)}
         onSummaryUpdate={(direction) => onFieldUpdate("summary", direction)}
+        // Time Axis props
+        totalDuration={8}
+        segments={formData.time_axis}
+        selectedSegment={selectedSegment}
+        onSegmentChange={onTimeAxisChange}
+        onSegmentSelect={onSegmentSelect}
+        onSegmentActionChange={onSegmentActionChange}
+        onSegmentCameraChange={onSegmentCameraChange}
+        onTimeIncrement={onTimeIncrement}
+        onTimeDecrement={onTimeDecrement}
+        timeAxisLocked={lockState.time_axis}
+        onTimeAxisLockToggle={() => onLockToggle("time_axis", "time_axis")}
+        onSegmentActionUpdate={(direction) =>
+          onFieldUpdate("segmentAction", direction)
+        }
+        onSegmentCameraUpdate={(direction) =>
+          onFieldUpdate("segmentCamera", direction)
+        }
+        visualStyle={formData.visualStyle}
+        audioDesign={formData.audioDesign}
+        setting={formData.setting}
+        characters={formData.characters}
+        apiKey={apiKey}
+        scenes={scenes}
+        activeSceneId={activeSceneId}
+        onReference={onReference}
+        getReferenceInfo={getReferenceInfo}
+        isFieldReferenced={isFieldReferenced}
       />
 
       <CharactersSection
@@ -149,39 +176,6 @@ const PromptForm: React.FC<PromptFormProps> = ({
         onUpdate={(field, direction) =>
           onFieldUpdate(`audioDesign.${field}`, direction)
         }
-        scenes={scenes}
-        activeSceneId={activeSceneId}
-        onReference={onReference}
-        getReferenceInfo={getReferenceInfo}
-        isFieldReferenced={isFieldReferenced}
-      />
-
-      <TimeAxisSection
-        totalDuration={8}
-        segments={formData.time_axis}
-        selectedSegment={selectedSegment}
-        onSegmentChange={onTimeAxisChange}
-        onSegmentSelect={onSegmentSelect}
-        onSegmentActionChange={onSegmentActionChange}
-        onSegmentCameraChange={onSegmentCameraChange}
-        onTimeIncrement={onTimeIncrement}
-        onTimeDecrement={onTimeDecrement}
-        locked={lockState.time_axis}
-        onLockToggle={() => onLockToggle("time_axis", "time_axis")}
-        onSegmentActionUpdate={(direction) =>
-          onFieldUpdate("segmentAction", direction)
-        }
-        onSegmentCameraUpdate={(direction) =>
-          onFieldUpdate("segmentCamera", direction)
-        }
-        visualStyle={formData.visualStyle}
-        audioDesign={formData.audioDesign}
-        setting={formData.setting}
-        characters={formData.characters}
-        title={formData.title}
-        concept={formData.concept}
-        summary={formData.summary}
-        apiKey={apiKey}
         scenes={scenes}
         activeSceneId={activeSceneId}
         onReference={onReference}
