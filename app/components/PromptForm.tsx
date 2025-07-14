@@ -45,6 +45,7 @@ interface PromptFormProps {
   onCharactersChange: (characters: Character[]) => void;
   onOutputFormatChange: (format: OutputFormat) => void;
   onSubmit: (e: React.FormEvent) => void;
+  onGeneratedData: (data: FormData) => void;
   onReference: (sourceSceneId: string, fieldPath: string) => void;
   getReferenceInfo: (fieldPath: string) => ReferenceInfo | undefined;
   isFieldReferenced: (fieldPath: string) => boolean;

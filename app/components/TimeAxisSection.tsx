@@ -83,7 +83,7 @@ export default function TimeAxisSection({
   return (
     <section className={styles.formSection}>
       <div className={styles.fieldHeader}>
-        <h2>Time Axis</h2>
+        <h2>タイムライン</h2>
         <div className={styles.headerButtons}>
           <ReferenceButton
             currentSceneId={activeSceneId}
@@ -108,12 +108,12 @@ export default function TimeAxisSection({
       {selectedSegment && (
         <div className={styles.segmentEditor}>
           <h3>
-            Edit Segment: {formatTimeForInput(selectedSegment.startTime)} -{" "}
+            セグメント: {formatTimeForInput(selectedSegment.startTime)} -{" "}
             {formatTimeForInput(selectedSegment.endTime)}
           </h3>
           <div className={styles.timeInputs}>
             <TimeInput
-              label="Start Time"
+              label="開始時間"
               value={selectedSegment.startTime}
               onIncrement={() => onTimeIncrement("startTime")}
               onDecrement={() => onTimeDecrement("startTime")}
@@ -137,7 +137,7 @@ export default function TimeAxisSection({
               }}
             />
             <TimeInput
-              label="End Time"
+              label="終了時間"
               value={selectedSegment.endTime}
               onIncrement={() => onTimeIncrement("endTime")}
               onDecrement={() => onTimeDecrement("endTime")}
@@ -163,10 +163,10 @@ export default function TimeAxisSection({
           </div>
           <FormField
             id="segmentAction"
-            label="Action"
+            label="アクション"
             value={selectedSegment.action}
             onChange={(value) => onSegmentActionChange(value as string)}
-            placeholder="Describe the action for this time segment"
+            placeholder="このセグメントのアクションの説明"
             type="textarea"
             rows={3}
             locked={locked}
@@ -175,10 +175,10 @@ export default function TimeAxisSection({
           />
           <FormField
             id="segmentCamera"
-            label="Camera"
+            label="カメラ"
             value={selectedSegment.camera}
             onChange={(value) => onSegmentCameraChange(value as string)}
-            placeholder="e.g., slow push-in → whip-pan"
+            placeholder="e.g., スロー・プッシュイン → ホイップ・パン"
             locked={locked}
             onUpdate={onSegmentCameraUpdate}
             fieldKey="segmentCamera"

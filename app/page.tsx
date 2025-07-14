@@ -1,14 +1,19 @@
 "use client";
 
+import {useState} from "react";
 import styles from "./page.module.css";
 import OutputSection from "./components/YamlOutputSection";
-import FloatingGenerator from "./components/FloatingGenerator";
+import ChatContainer from "./components/ChatContainer";
 import ApiKeyManager from "./components/ApiKeyManager";
+import ApiKeyModal from "./components/ApiKeyModal";
 import PromptForm from "./components/PromptForm";
 import SceneManager from "./components/SceneManager";
 import {useFormState} from "./hooks/useFormState";
+import GenerateButton from "./components/GenerateButton";
 
 export default function Home() {
+  const [isApiKeyModalOpen, setIsApiKeyModalOpen] = useState(false);
+
   const {
     scenes,
     activeSceneId,
@@ -48,66 +53,87 @@ export default function Home() {
     isFieldReferenced,
   } = useFormState();
 
+  const handleApiKeySet = (newApiKey: string) => {
+    setApiKey(newApiKey);
+  };
+
   return (
     <div className={styles.page}>
       <main className={styles.main}>
-        <SceneManager
-          scenes={scenes}
-          activeSceneId={activeSceneId}
-          onSceneChange={handleSceneChange}
-          onSceneCreate={handleSceneCreate}
-          onSceneDelete={handleSceneDelete}
-          onSceneRename={handleSceneRename}
-        />
+        <div className={styles.formContainer}>
+          <SceneManager
+            scenes={scenes}
+            activeSceneId={activeSceneId}
+            onSceneChange={handleSceneChange}
+            onSceneCreate={handleSceneCreate}
+            onSceneDelete={handleSceneDelete}
+            onSceneRename={handleSceneRename}
+          />
+          <GenerateButton
+            formData={formData}
+            lockState={lockState}
+            onGenerate={handleGeneratedData}
+            apiKey={apiKey}
+          />
 
-        <PromptForm
-          formData={formData}
-          lockState={lockState}
-          selectedSegment={selectedSegment}
-          outputFormat={outputFormat}
-          isGenerating={isGenerating}
-          apiKey={apiKey}
-          scenes={scenes}
-          activeSceneId={activeSceneId}
-          onInputChange={handleInputChange}
-          onVisualStyleChange={handleVisualStyleChange}
-          onAudioDesignChange={handleAudioDesignChange}
-          onTimeAxisChange={handleTimeAxisChange}
-          onSegmentSelect={handleSegmentSelect}
-          onSegmentActionChange={handleSegmentActionChange}
-          onSegmentCameraChange={handleSegmentCameraChange}
-          onTimeIncrement={handleTimeIncrement}
-          onTimeDecrement={handleTimeDecrement}
-          onLockToggle={handleLockToggle}
-          onFieldUpdate={handleFieldUpdate}
-          onCharactersChange={handleCharactersChange}
-          onOutputFormatChange={setOutputFormat}
-          onSubmit={handleSubmit}
-          onReference={handleReference}
-          getReferenceInfo={getReferenceInfo}
-          isFieldReferenced={isFieldReferenced}
-        />
+          <PromptForm
+            formData={formData}
+            lockState={lockState}
+            selectedSegment={selectedSegment}
+            outputFormat={outputFormat}
+            isGenerating={isGenerating}
+            apiKey={apiKey}
+            scenes={scenes}
+            activeSceneId={activeSceneId}
+            onInputChange={handleInputChange}
+            onVisualStyleChange={handleVisualStyleChange}
+            onAudioDesignChange={handleAudioDesignChange}
+            onTimeAxisChange={handleTimeAxisChange}
+            onSegmentSelect={handleSegmentSelect}
+            onSegmentActionChange={handleSegmentActionChange}
+            onSegmentCameraChange={handleSegmentCameraChange}
+            onTimeIncrement={handleTimeIncrement}
+            onTimeDecrement={handleTimeDecrement}
+            onLockToggle={handleLockToggle}
+            onFieldUpdate={handleFieldUpdate}
+            onCharactersChange={handleCharactersChange}
+            onOutputFormatChange={setOutputFormat}
+            onSubmit={handleSubmit}
+            onGeneratedData={handleGeneratedData}
+            onReference={handleReference}
+            getReferenceInfo={getReferenceInfo}
+            isFieldReferenced={isFieldReferenced}
+          />
 
-        <OutputSection
-          content={generatedContent}
-          japanese={generatedJapanese}
-          showOutput={showOutput}
-          copySuccess={copySuccess}
-          outputFormat={outputFormat}
-          onCopy={handleCopyYaml}
-        />
+          <OutputSection
+            content={generatedContent}
+            japanese={generatedJapanese}
+            showOutput={showOutput}
+            copySuccess={copySuccess}
+            outputFormat={outputFormat}
+            onCopy={handleCopyYaml}
+          />
+        </div>
+        <div className={styles.chatContainer}>
+          <ChatContainer
+            formData={formData}
+            onGenerate={handleGeneratedData}
+            apiKey={apiKey}
+          />
+        </div>
       </main>
 
-      <FloatingGenerator
-        formData={formData}
-        lockState={lockState}
-        onGenerate={handleGeneratedData}
-        apiKey={apiKey}
-      />
+      <footer className={styles.footer}>
+        <ApiKeyManager
+          onOpen={() => setIsApiKeyModalOpen(true)}
+          currentApiKey={apiKey}
+        />
+      </footer>
 
-      <ApiKeyManager
-        onApiKeySet={(value: string) => setApiKey(value)}
-        currentApiKey={apiKey}
+      <ApiKeyModal
+        isOpen={isApiKeyModalOpen}
+        onClose={() => setIsApiKeyModalOpen(false)}
+        onApiKeySet={handleApiKeySet}
       />
     </div>
   );

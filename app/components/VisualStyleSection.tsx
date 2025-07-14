@@ -43,7 +43,7 @@ export default function VisualStyleSection({
   return (
     <section className={styles.formSection}>
       <div className={styles.sectionHeader}>
-        <h2>Visual Style</h2>
+        <h2>ビジュアル</h2>
         <ReferenceButton
           currentSceneId={activeSceneId}
           scenes={scenes}
@@ -55,10 +55,10 @@ export default function VisualStyleSection({
       </div>
       <FormField
         id="style"
-        label="Style"
+        label="スタイル"
         value={visualStyle.style}
         onChange={(value) => handleChange("style", value)}
-        placeholder="e.g., cinematic, documentary, anime, illustration"
+        placeholder="e.g., シネマティック, ドキュメンタリー, アニメ, イラスト"
         locked={lockState?.style}
         onLockToggle={onLockToggle ? () => onLockToggle("style") : undefined}
         onUpdate={onUpdate}
@@ -66,10 +66,10 @@ export default function VisualStyleSection({
       />
       <FormField
         id="palette"
-        label="Color Palette"
+        label="色彩"
         value={visualStyle.palette}
         onChange={(value) => handleChange("palette", value)}
-        placeholder="e.g., warm earth tones, cool blues, high contrast"
+        placeholder="e.g., 暖色系, 冷色系, 高コントラスト"
         locked={lockState?.palette}
         onLockToggle={onLockToggle ? () => onLockToggle("palette") : undefined}
         onUpdate={onUpdate}
@@ -77,10 +77,10 @@ export default function VisualStyleSection({
       />
       <FormField
         id="lighting"
-        label="Lighting"
+        label="ライティング"
         value={visualStyle.lighting}
         onChange={(value) => handleChange("lighting", value)}
-        placeholder="e.g., natural daylight, dramatic shadows, soft diffused"
+        placeholder="e.g., 自然光, ドラマチックな影, ソフトな拡散"
         locked={lockState?.lighting}
         onLockToggle={onLockToggle ? () => onLockToggle("lighting") : undefined}
         onUpdate={onUpdate}

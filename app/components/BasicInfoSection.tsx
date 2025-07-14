@@ -108,13 +108,13 @@ export default function BasicInfoSection({
 
   return (
     <section className={styles.formSection}>
-      <h2>Basic Information</h2>
+      <h2>基本情報</h2>
       <FormField
         id="title"
-        label="Title"
+        label="タイトル"
         value={title}
         onChange={(value) => onTitleChange(value as string)}
-        placeholder="Enter scene title"
+        placeholder="シーンのタイトル"
         locked={titleLocked}
         onLockToggle={onTitleLockToggle}
         onUpdate={onTitleUpdate}
@@ -122,7 +122,7 @@ export default function BasicInfoSection({
       />
       <FormField
         id="concept"
-        label="Concept"
+        label="コンセプト"
         value={concept}
         onChange={(value) => onConceptChange(value as string)}
         placeholder="超短い核イメージ (例: サングラスをかけた犬が嵐のビーチを逃げる)"
@@ -135,7 +135,7 @@ export default function BasicInfoSection({
       />
       <FormField
         id="summary"
-        label="Summary"
+        label="要約"
         value={summary}
         onChange={(value) => onSummaryChange(value as string)}
         placeholder="全体像を時間軸なしで説明 (例: 主人公のゴールデンレトリバーが巨大な岩から必死に逃げるアクション。舞台は嵐の熱帯ビーチで、激しい自然音とドラマティックなライティングが特徴。)"
@@ -147,7 +147,7 @@ export default function BasicInfoSection({
         fieldKey="summary"
       />
 
-      <h2>Time Axis</h2>
+      <h2>タイムライン</h2>
       <div className={styles.fieldHeader}>
         <div className={styles.headerButtons}>
           <ReferenceButton
@@ -176,12 +176,12 @@ export default function BasicInfoSection({
       {selectedSegment && (
         <div className={styles.segmentEditor}>
           <h3>
-            Edit Segment: {formatTimeForInput(selectedSegment.startTime)} -{" "}
+            セグメント: {formatTimeForInput(selectedSegment.startTime)} -{" "}
             {formatTimeForInput(selectedSegment.endTime)}
           </h3>
           <div className={styles.timeInputs}>
             <TimeInput
-              label="Start Time"
+              label="開始時間"
               value={selectedSegment.startTime}
               onIncrement={() => onTimeIncrement("startTime")}
               onDecrement={() => onTimeDecrement("startTime")}
@@ -205,7 +205,7 @@ export default function BasicInfoSection({
               }}
             />
             <TimeInput
-              label="End Time"
+              label="終了時間"
               value={selectedSegment.endTime}
               onIncrement={() => onTimeIncrement("endTime")}
               onDecrement={() => onTimeDecrement("endTime")}
@@ -231,10 +231,10 @@ export default function BasicInfoSection({
           </div>
           <FormField
             id="segmentAction"
-            label="Action"
+            label="アクション"
             value={selectedSegment.action}
             onChange={(value) => onSegmentActionChange(value as string)}
-            placeholder="Describe the action for this time segment"
+            placeholder="このセグメントのアクションの説明"
             type="textarea"
             rows={3}
             locked={timeAxisLocked}
@@ -243,10 +243,10 @@ export default function BasicInfoSection({
           />
           <FormField
             id="segmentCamera"
-            label="Camera"
+            label="カメラ"
             value={selectedSegment.camera}
             onChange={(value) => onSegmentCameraChange(value as string)}
-            placeholder="e.g., slow push-in → whip-pan"
+            placeholder="e.g., スロー・プッシュイン → ホイップ・パン"
             locked={timeAxisLocked}
             onUpdate={onSegmentCameraUpdate}
             fieldKey="segmentCamera"

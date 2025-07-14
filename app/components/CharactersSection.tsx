@@ -60,7 +60,7 @@ export default function CharactersSection({
   return (
     <section className={styles.formSection}>
       <div className={styles.sectionHeader}>
-        <h2>Characters</h2>
+        <h2>キャラクター</h2>
         <div className={styles.headerButtons}>
           <ReferenceButton
             currentSceneId={activeSceneId}
@@ -79,36 +79,36 @@ export default function CharactersSection({
       {characters.map((character, index) => (
         <div key={index} className={styles.characterCard}>
           <div className={styles.characterHeader}>
-            <h3>Character {index + 1}</h3>
+            <h3>キャラクター {index + 1}</h3>
             <button
               type="button"
               onClick={() => removeCharacter(index)}
               className={styles.removeButton}
               disabled={lockState}
             >
-              Remove
+              削除
             </button>
           </div>
           <FormField
             id={`character-${index}-name`}
-            label="Name"
+            label="名前"
             value={character.name}
             onChange={(value) =>
               handleCharacterChange(index, "name", value as string)
             }
-            placeholder="Character name"
+            placeholder="キャラクターの名前"
             locked={lockState}
             onUpdate={onUpdate}
             fieldKey={`characters.${index}.name`}
           />
           <FormField
             id={`character-${index}-description`}
-            label="Description"
+            label="説明"
             value={character.description}
             onChange={(value) =>
               handleCharacterChange(index, "description", value as string)
             }
-            placeholder="Physical appearance and characteristics"
+            placeholder="キャラクターの外見や特徴"
             type="textarea"
             rows={3}
             locked={lockState}
@@ -124,7 +124,7 @@ export default function CharactersSection({
         className={styles.addButton}
         disabled={lockState}
       >
-        + Add Character
+        + キャラクターを追加
       </button>
     </section>
   );

@@ -3,26 +3,22 @@
 import {useState} from "react";
 import styles from "../page.module.css";
 import {FormData, LockState} from "../types";
-import ChatInterface from "./ChatInterface";
 
-type FloatingGeneratorProps = {
+type GenerateButtonProps = {
   formData: FormData;
   lockState: LockState;
   onGenerate: (data: FormData) => void;
   apiKey?: string;
 };
 
-export default function FloatingGenerator({
+export default function GenerateButton({
   formData,
   lockState,
   onGenerate,
   apiKey,
-}: FloatingGeneratorProps) {
+}: GenerateButtonProps) {
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [showInstructions, setShowInstructions] = useState(false);
-  const [instructions, setInstructions] = useState("");
-  const [isChatMinimized, setIsChatMinimized] = useState(false);
 
   const generateContent = async () => {
     // ロックされていない項目があるかチェック
@@ -101,12 +97,8 @@ export default function FloatingGenerator({
         time_axis: lockState.time_axis ? formData.time_axis : null,
       };
 
-      const instructionText = instructions.trim()
-        ? `\n\n特別な指示：${instructions}`
-        : "";
-
       const prompt = `
-ロックされていない項目のみを生成してください。ロックされた項目は変更せず、一貫性のある内容を生成してください。${instructionText}
+ロックされていない項目のみを生成してください。ロックされた項目は変更せず、一貫性のある内容を生成してください。
 
 現在の設定：
 タイトル: ${lockedInfo.title || "未設定"}
@@ -206,98 +198,17 @@ export default function FloatingGenerator({
   };
 
   return (
-    <>
-      <div className={styles.floatingGenerator}>
-        {showInstructions && (
-          <div className={styles.floatingInstructions}>
-            <textarea
-              value={instructions}
-              onChange={(e) => setInstructions(e.target.value)}
-              placeholder="例：全体的に明るいトーンにして、ポップなプロットに書き換えて..."
-              className={styles.instructionsTextarea}
-              rows={3}
-            />
-            <div className={styles.instructionsButtons}>
-              <button
-                type="button"
-                onClick={() => setShowInstructions(false)}
-                className={styles.closeInstructionsButton}
-              >
-                閉じる
-              </button>
-              <button
-                type="button"
-                onClick={() => setInstructions("")}
-                className={styles.clearInstructionsButton}
-              >
-                クリア
-              </button>
-            </div>
-          </div>
-        )}
-        <button
-          type="button"
-          onClick={() => setIsChatMinimized(!isChatMinimized)}
-          className={styles.chatToggleButton}
-        >
-          {isChatMinimized ? "💬" : "_"}
-        </button>
-        <button
-          type="button"
-          onClick={() => setShowInstructions(!showInstructions)}
-          className={styles.toggleInstructionsButton}
-        >
-          {showInstructions ? "指示を隠す" : "指示を表示"}
-        </button>
-        <button
-          type="button"
-          onClick={generateContent}
-          disabled={isGenerating}
-          className={styles.floatingGenerateButton}
-        >
-          {isGenerating ? "生成中..." : "Fill / Update Fields"}
-        </button>
-        {error && <div className={styles.error}>{error}</div>}
-      </div>
-
-      {/* チャットインターフェース */}
-      {!isChatMinimized && (
-        <ChatInterface
-          formData={formData}
-          onUpdateFormData={(updater: (prev: FormData) => FormData) => {
-            const updatedData = updater(formData);
-            onGenerate(updatedData);
-          }}
-          apiKey={apiKey}
-          onMinimize={() => setIsChatMinimized(true)}
-          onGenerateContent={generateContent}
-          onTranslate={async (content: string, type: string) => {
-            try {
-              const response = await fetch("/api/translate", {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                  content,
-                  type,
-                  customApiKey: apiKey,
-                }),
-              });
-              if (response.ok) {
-                const data = await response.json();
-                onGenerate(data);
-              }
-            } catch (error) {
-              console.error("Translation error:", error);
-            }
-          }}
-          onGenerateImage={async (segmentId: string) => {
-            // 画像生成機能は現在のセグメントに対して実行
-            console.log("Generate image for segment:", segmentId);
-          }}
-        />
-      )}
-    </>
+    <div className={styles.generateButtonContainer}>
+      <button
+        type="button"
+        onClick={generateContent}
+        disabled={isGenerating}
+        className={styles.floatingGenerateButton}
+        data-generate-button
+      >
+        {isGenerating ? "生成中..." : "Fill / Update Fields"}
+      </button>
+      {error && <div className={styles.error}>{error}</div>}
+    </div>
   );
 }

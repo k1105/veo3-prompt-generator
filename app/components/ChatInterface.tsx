@@ -8,7 +8,6 @@ interface ChatInterfaceProps {
   formData: FormData;
   onUpdateFormData: (updater: (prev: FormData) => FormData) => void;
   apiKey?: string;
-  onMinimize: () => void;
   onGenerateContent?: () => Promise<void>;
   onTranslate?: (content: string, type: string) => Promise<void>;
   onGenerateImage?: (segmentId: string) => Promise<void>;
@@ -18,7 +17,6 @@ export default function ChatInterface({
   formData,
   onUpdateFormData,
   apiKey,
-  onMinimize,
   onGenerateContent,
   onTranslate,
   onGenerateImage,
@@ -370,7 +368,6 @@ export default function ChatInterface({
   return (
     <div className={styles.chatInterface}>
       <div className={styles.chatHeader}>
-        <h3>AI アシスタント</h3>
         <div className={styles.chatHeaderButtons}>
           <button
             type="button"
@@ -378,13 +375,6 @@ export default function ChatInterface({
             className={styles.clearChatButton}
           >
             クリア
-          </button>
-          <button
-            type="button"
-            onClick={onMinimize}
-            className={styles.minimizeChatButton}
-          >
-            _
           </button>
         </div>
       </div>

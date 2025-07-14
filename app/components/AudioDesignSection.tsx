@@ -39,7 +39,7 @@ export default function AudioDesignSection({
   return (
     <section className={styles.formSection}>
       <div className={styles.sectionHeader}>
-        <h2>Audio Design</h2>
+        <h2>音響</h2>
         <ReferenceButton
           currentSceneId={activeSceneId}
           scenes={scenes}
@@ -54,7 +54,7 @@ export default function AudioDesignSection({
         label="BGM"
         value={audioDesign.bgm}
         onChange={(value) => onChange("bgm", value as string)}
-        placeholder="Background music description"
+        placeholder="背景音楽の説明"
         type="textarea"
         rows={2}
         locked={lockState?.bgm}
@@ -64,10 +64,10 @@ export default function AudioDesignSection({
       />
       <FormField
         id="sfx"
-        label="SFX"
+        label="効果音"
         value={audioDesign.sfx}
         onChange={(value) => onChange("sfx", value as string)}
-        placeholder="Sound effects description"
+        placeholder="効果音の説明"
         type="textarea"
         rows={2}
         locked={lockState?.sfx}
@@ -77,10 +77,10 @@ export default function AudioDesignSection({
       />
       <FormField
         id="ambience"
-        label="Ambience"
+        label="環境音"
         value={audioDesign.ambience}
         onChange={(value) => onChange("ambience", value as string)}
-        placeholder="Environmental sounds and atmosphere"
+        placeholder="環境音や雰囲気の説明"
         type="textarea"
         rows={2}
         locked={lockState?.ambience}
@@ -90,10 +90,10 @@ export default function AudioDesignSection({
       />
       <FormField
         id="dialogue"
-        label="Dialogue"
+        label="セリフ"
         value={audioDesign.dialogue}
         onChange={(value) => onChange("dialogue", value as string)}
-        placeholder="Character dialogue and conversations"
+        placeholder="キャラクターの会話やセリフ"
         type="textarea"
         rows={3}
         locked={lockState?.dialogue}
@@ -103,10 +103,10 @@ export default function AudioDesignSection({
       />
       <FormField
         id="voiceover"
-        label="Voiceover"
+        label="ナレーション"
         value={audioDesign.voiceover}
         onChange={(value) => onChange("voiceover", value as string)}
-        placeholder="Narration or voiceover content"
+        placeholder="ナレーションやボイスオーバーの内容"
         type="textarea"
         rows={2}
         locked={lockState?.voiceover}
